@@ -1,0 +1,49 @@
+#= require Splash
+
+PhaserPeer = window.PhaserPeer
+
+Splash = PhaserPeer.Splash
+
+class Main extends Phaser.State
+  constructor:(@parent='')->
+
+  run:(debug = false)->
+    mode = if debug then Phaser.CANVAS else Phaser.AUTO
+    new Phaser.Game(896, 504, mode, @parent, this)
+
+  destroy:->
+    destroy(@text)
+    destroy(@graphics)
+
+  preload:->  
+    @game.stage.disableVisibilityChange=true
+
+    @game.stage.scale.pageAlignHorizontally = true
+    @game.stage.scale.pageAlignVertically = false
+    @game.stage.scale.setShowAll()
+    @game.stage.scale.refresh()
+
+    @game.stage.scale.enterLandscape.add =>
+      @game.stage.scale.setShowAll()
+      @game.stage.scale.refresh()
+
+    @game.stage.scale.enterPortrait.add =>
+      @game.stage.scale.setShowAll()
+      @game.stage.scale.refresh()
+
+    @game.physics.gravity.y = 400
+
+  loadRender:->
+    @graphics.beginFill(0x00ff44)
+    @graphics.drawRect(200, 340, 5 * @game.load.progress, 20)
+    @graphics.endFill()
+
+  render:->
+    @graphics.clear()
+    @loadRender() unless @game.load.hasLoaded
+
+  ready:=>
+
+  startGame:=>
+
+PhaserPeer.Main = Main
