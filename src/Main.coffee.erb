@@ -18,31 +18,49 @@ class Main extends Phaser.State
     @game.physics.startSystem(Phaser.Physics.ARCADE)
 
     @dudes = @game.add.group()
-    @dudes.enableBody = true
     @player = @addDude(@myId, 0, 0, 'dude')
 
-    @game.physics.arcade.enable(@dudes)
+    @game.physics.arcade.enable(@player)
     console.log(@dudes)
     @cursors = @game.input.keyboard.createCursorKeys()
 
-    @peer = new Peer({ debug: 3, host: '10.66.4.22' })
+    @peer = new Peer({ debug: 0, host: '10.66.4.22' })
+
+    @allPeers = []
+    @myPeerId = null
     @peer.on 'open', (id)=>
       console.log('My peer ID is: ' + id)
-      @peer.listAllPeers (data)->
-        console.log(data)
+      @myPeerId = id
+      @peer.listAllPeers (data)=>
+        data = _.without(data, @myPeerId)
+        console.log('all peers: ' + data)
+
+        @allPeers = _.map data, (pid) =>
+          connection = @peer.connect(pid)
+          connection.on 'open', =>
+            connection.send({message:"arrive", id: @myPeerId})
+            @addDude(connection.peer, data.x, data.y)
+          connection
+
+    @peer.on 'connection', (connection)=>
+      connection.on 'data', (data)=>
+        if data.message == "update"
+          @updateDude(connection.peer, data.x, data.y)
+        else if data.message == "arrive"
+          console.info(data)
+          connection = @peer.connect data.id
+          @allPeers.push(connection)
+          @addDude(connection.peer, data.x, data.y)
 
   addDude:(dudeId, x, y)->
-
     dude = @dudes.create(x, y, 'dude')
     @dudesById[dudeId] = dude
     dude
 
   updateDude:(dudeId, x, y)->
-    @dudes[dudeId].body.velocity.x = 0
-    @dudes[dudeId].body.velocity.y = 0
-    @dudes[dudeId].body.x = x
-    @dudes[dudeId].body.y = y
-
+    dude = @dudesById[dudeId]
+    dude.position.x = x
+    dude.position.y = y
 
   update:->
     @player.body.velocity.x = 0
@@ -59,11 +77,9 @@ class Main extends Phaser.State
 
     @sendUpdate(@myId, @player.body.x, @player.body.y)
 
-  getUpdate:(data) ->
-    console.log("Got some dude data: ", data)
-
   sendUpdate:(id, x, y) ->
-    console.log("Need to tell everyone that dude:#{id} is at #{x}, #{y}")
+    _.each @allPeers, (connection)->
+      connection.send({message: "update", x: x, y: y})
 
   destroy:->
 
