@@ -1,8 +1,4 @@
-#= require Splash
-
 MusicalSacrifice = window.MusicalSacrifice
-
-Splash = MusicalSacrifice.Splash
 
 class Main extends Phaser.State
   constructor:(@parent='')->
