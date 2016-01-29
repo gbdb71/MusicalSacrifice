@@ -33,29 +33,39 @@ class Main extends Phaser.State
       @myPeerId = id
       @peer.listAllPeers (data)=>
         data = _.without(data, @myPeerId)
-        console.log('all peers: ' + data)
+        @allPeers = _.map data, (peerId) =>
+          channel = @peer.connect(peerId)
+          channel.on 'open', =>
+            channel.send({message:"arrive"})
+            @addDude(channel.peer, data.x, data.y)
+          channel
 
-        @allPeers = _.map data, (pid) =>
-          connection = @peer.connect(pid)
-          connection.on 'open', =>
-            connection.send({message:"arrive", id: @myPeerId})
-            @addDude(connection.peer, data.x, data.y)
-          connection
+        console.log('all peers: ' + _.map @allPeers, (channel)->channel.peer )
 
-    @peer.on 'connection', (connection)=>
-      connection.on 'data', (data)=>
+
+    @peer.on 'connection', (remote)=>
+      remote.on 'data', (data)=>
         if data.message == "update"
-          @updateDude(connection.peer, data.x, data.y)
+          @updateDude(remote.peer, data.x, data.y)
         else if data.message == "arrive"
           console.info(data)
-          connection = @peer.connect data.id
-          @allPeers.push(connection)
-          @addDude(connection.peer, data.x, data.y)
+          channel = @peer.connect remote.peer
+          @allPeers.push(channel)
+          console.log('all peers: ' + _.map @allPeers, (channel)->channel.peer)
+          @addDude(remote.peer, data.x, data.y)
+      remote.on 'close', =>
+        @allPeers = _.reject @allPeers, (channel)-> channel.peer == remote.peer
+        @removeDude(remote.peer)
 
   addDude:(dudeId, x, y)->
     dude = @dudes.create(x, y, 'dude')
     @dudesById[dudeId] = dude
     dude
+
+  removeDude:(dudeId)->
+    dude = @dudesById[dudeId]
+    dude.kill()
+    delete @dudesById[dudeId]
 
   updateDude:(dudeId, x, y)->
     dude = @dudesById[dudeId]
