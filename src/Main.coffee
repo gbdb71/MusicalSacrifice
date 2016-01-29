@@ -5,7 +5,7 @@ class Main extends Phaser.State
 
   run:(debug = false)->
     mode = if debug then Phaser.CANVAS else Phaser.AUTO
-    new Phaser.Game(896, 504, mode, @parent, this)
+    new Phaser.Game(800, 450, mode, @parent, this, false, false, null)
 
   create: ->
     @dudesById = {}
@@ -14,7 +14,7 @@ class Main extends Phaser.State
     @game.physics.startSystem(Phaser.Physics.ARCADE)
 
     @dudes = @game.add.group()
-    @player = @addDude(@myId, 0, 0, 'dude')
+    @player = @addDude(@myId, 0, 0, 'nigel')
 
     @game.physics.arcade.enable(@player)
     console.log(@dudes)
@@ -54,7 +54,12 @@ class Main extends Phaser.State
         @removeDude(remote.peer)
 
   addDude:(dudeId, x, y)->
-    dude = @dudes.create(x, y, 'dude')
+    dude = @dudes.create(x, y, 'nigel')
+    dude.animations.frame = 1
+    dude.animations.add("down", [0, 1, 2, 1], 10, true)
+    dude.animations.add("left", [4, 5, 6, 5], 20, true)
+    dude.animations.add("right", [8, 9, 10, 9], 10, true)
+    dude.animations.add("up", [12, 13, 14, 13], 20, true)
     @dudesById[dudeId] = dude
     dude
 
@@ -77,9 +82,18 @@ class Main extends Phaser.State
     else if (@cursors.right.isDown)
       @player.body.velocity.x = 150
       @player.animations.play('right')
+    else if (@cursors.up.isDown)
+      @player.body.velocity.y = -150
+      @player.animations.play('up')
+    else if (@cursors.down.isDown)
+      @player.body.velocity.y = 150
+      @player.animations.play('down')
     else
       @player.animations.stop()
       @player.frame = 4
+
+    @player.body.velocity.x *= 0.5
+    @player.body.velocity.y *= 0.5
 
     @sendUpdate(@myId, @player.body.x, @player.body.y)
 
@@ -90,7 +104,8 @@ class Main extends Phaser.State
   destroy:->
 
   preload:->
-    @game.load.image('dude', 'assets/dude.png')
+    @game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL
+    @game.load.spritesheet('nigel', 'assets/nigel.png', 32, 32)
 
   loadRender:->
 
