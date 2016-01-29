@@ -14,3 +14,7 @@ configure :build do
   activate :relative_assets
   set :relative_links, true
 end
+
+ready do
+  sprockets.append_path '../src'
+end
