@@ -28,7 +28,8 @@ class Main extends Phaser.State
     @peer = new Peer({ debug: 3, host: '10.66.4.22' })
     @peer.on 'open', (id)=>
       console.log('My peer ID is: ' + id)
-      console.log(@peer.listAllPeers())
+      @peer.listAllPeers (data)->
+        console.log(data)
 
   addDude:(dudeId, x, y)->
 
