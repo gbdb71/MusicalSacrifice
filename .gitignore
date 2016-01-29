@@ -4,3 +4,4 @@ build
 .cache
 .sass-cache
 tmp
+.tags
