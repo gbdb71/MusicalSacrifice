@@ -1,4 +1,4 @@
-PhaserPeer = window.PhaserPeer
+MusicalSacrifice = window.MusicalSacrifice
 
 class Splash extends Phaser.State
   constructor:->
@@ -11,4 +11,4 @@ class Splash extends Phaser.State
   done:=>
     @game.state.start('landscape')
 
-PhaserPeer.Splash = Splash
+MusicalSacrifice.Splash = Splash

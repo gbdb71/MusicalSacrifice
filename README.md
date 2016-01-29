@@ -1,5 +1,5 @@
-Phaser Peer
-===========
+Musical Sacrifice
+=================
 
 Local multiplayer web game thing.
 
@@ -21,4 +21,4 @@ Deploy
 Copyright
 ---------
 
-Copyright (c) 2016 Jason Hutchens. See UNLICENSE for further details.
+Copyright (c) 2016 RocketHands. See UNLICENSE for further details.
