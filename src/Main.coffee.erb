@@ -23,6 +23,11 @@ class Main extends Phaser.State
     console.log(@dudes)
     @cursors = @game.input.keyboard.createCursorKeys();
 
+    @peer = new Peer({ debug: 3, host: '10.66.4.22' })
+    @peer.on 'open', (id)=>
+      console.log('My peer ID is: ' + id)
+      console.log(@peer.listAllPeers())
+
   update:->
 
     @player.body.velocity.x = 0
