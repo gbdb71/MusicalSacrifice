@@ -15,6 +15,11 @@ configure :build do
   set :relative_links, true
 end
 
+activate :deploy do |deploy|
+  deploy.method = :git
+  deploy.build_before = true
+end
+
 ready do
   sprockets.append_path '../src'
 end
