@@ -7,6 +7,13 @@ class Main extends Phaser.State
     mode = if debug then Phaser.CANVAS else Phaser.AUTO
     new Phaser.Game(800, 450, mode, @parent, this, false, false, null)
 
+  init: ->
+    @game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL
+    @game.scale.pageAlignVertically = true
+    @game.scale.pageAlignHorizontally = true
+
+    @game.stage.backgroundColor = 0x886666;
+
   create: ->
     @dudesById = {}
     @myId = '555'
@@ -104,7 +111,13 @@ class Main extends Phaser.State
   destroy:->
 
   preload:->
-    @game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL
+    @game.input.gamepad.start
+    @pads = [
+      @game.input.gamepad.pad1,
+      @game.input.gamepad.pad2,
+      @game.input.gamepad.pad3,
+      @game.input.gamepad.pad4
+    ]
     @game.load.spritesheet('nigel', 'assets/nigel.png', 32, 32)
 
   loadRender:->
