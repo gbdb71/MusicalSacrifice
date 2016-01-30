@@ -88,6 +88,7 @@ class EntityManager
       @cleanUpOldLevel()
 
   processIncoming:(data, remote)->
+    console.debug(data) unless data.message == "update"
     if data.message == "initEntity"
       if (!data.forLevel && !@level) || data.forLevel == @level
         @spawnRemoteEntity(data.type, data.id, remote.peer, data.state)
