@@ -10,13 +10,13 @@ class Ball extends Entity
   constructor: ->
     super
 
-    @sprite = @host.spriteGroup.create(-100,-100, 'ball')
+    @sprite = @group.create(-100,-100, 'ball')
     @possessorId = null
     @catchable = false
     @kickTime = Date.now()
 
     if !@isRemote
-      @host.game.physics.arcade.enable(@sprite)
+      @game.physics.arcade.enable(@sprite)
       @sprite.body.drag.set(DRAG, DRAG)
       @sprite.body.collideWorldBounds = true
       @sprite.body.bounce.set(0.9,0.9)
@@ -51,19 +51,19 @@ class Ball extends Entity
 
   controlledUpdate:->
     if @possessorId?
-      possessor = @manager.entities[@possessorId]
+      possessor = @game.entityManager.entities[@possessorId]
       if possessor?
         @sprite.position.x = possessor.sprite.position.x + 10
         @sprite.position.y = possessor.sprite.position.y + 24
 
-        moves = @host.pollController()
+        moves = @game.controller.poll()
         if (moves.but1)
           vector = possessor.sprite.body.acceleration.clone().setMagnitude(KICK_MAGNITUDE)
           @kick(vector)
 
     else if @catchable
       # get all avatars and see if any are overlapping
-      avatars = _.filter(@manager.entities, (entity)-> entity.type == "Avatar")
+      avatars = _.filter(@game.entityManager.entities, (entity)-> entity.type == "Avatar")
       _.each(avatars, (avatar)=>
         if Phaser.Rectangle.intersects(avatar.sprite.getBounds(), @sprite.getBounds())
           @possessorId = avatar.id

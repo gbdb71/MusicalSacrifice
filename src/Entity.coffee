@@ -1,11 +1,9 @@
 class Entity
-  constructor: (manager, id, isRemote, broadcastStateFn)->
+  constructor: (@game, @group, id, isRemote, broadcastStateFn)->
     @isRemote = isRemote
     @id = id
     @lastState = {}
     @broadcastState = broadcastStateFn
-    @manager = manager
-    @host = manager.host
     @type = @constructor.name
 
   update: ->

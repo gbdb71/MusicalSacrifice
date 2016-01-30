@@ -2,16 +2,22 @@
 #= require Avatar
 #= require Ball
 
+MS = window.MusicalSacrifice
+
 class EntityManager
-  constructor: (host, hostPeerId)->
-    @hostPeerId = hostPeerId
+  constructor: (@game)->
+    # TBD: hook up game.network.on...
+    # @sendInitForAllOwnedEntitiesToChannel
+    # @processIncoming
+    # @despawnEntitiesForPeerId
     @idCounter = 0
-    @host = host
     @entities = {}
+
+  setGroup: (@group)->
 
   getNewId:->
     @idCounter += 1
-    @hostPeerId + @idCounter
+    @game.network.myPeerId + @idCounter
 
   spawnRemoteEntity: (type, id, state)->
     console.log("Spawning remote #{type} #{id} #{state}")
@@ -26,7 +32,7 @@ class EntityManager
 
   addEntity: (type, id, isRemote, state)=>
     entityClass = window[type] # get class from string
-    e = new entityClass(this, id, isRemote, @broadcastEntityState)
+    e = new entityClass(@game, @group, id, isRemote, @broadcastEntityState)
     e.setState(state)
     @entities[id] = e
 
@@ -45,14 +51,14 @@ class EntityManager
         entity.setState(data.state)
 
   broadcastEntityState:(id, state)->
-    @host.broadcastToAllChannels({
+    @game.network.broadcastToAllChannels({
       "message": "update",
       "id": id,
       "state": state
     })
 
   broadcastInitEntity:(entity)->
-    @host.broadcastToAllChannels @getInitEntityMessage(entity)
+    @game.network.broadcastToAllChannels @getInitEntityMessage(entity)
 
   sendInitForAllOwnedEntitiesToChannel:(channel)->
     _.each(@getMyEntities(), (entity)=>
@@ -75,4 +81,4 @@ class EntityManager
     _.filter(@entities, (entity)-> entity.id.startsWith(peerId))
 
 
-window.EntityManager = EntityManager
+MS.EntityManager = EntityManager

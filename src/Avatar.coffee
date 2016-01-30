@@ -12,8 +12,8 @@ class Avatar extends Entity
       acceleration: new Phaser.Point
       max_velocity: new Phaser.Point
 
-    @skin = @host.generator.pick(['nigel','bruce', 'julie', 'rachel'])
-    @sprite = @host.spriteGroup.create(-100,-100, @skin)
+    @skin = @game.generator.pick(['nigel','bruce', 'julie', 'rachel'])
+    @sprite = @group.create(-100,-100, @skin)
     @sprite.animations.add("down", [0, 1, 2, 1], 10, true)
     @sprite.animations.add("left", [4, 5, 6, 5], 10, true)
     @sprite.animations.add("right", [8, 9, 10, 9], 10, true)
@@ -21,7 +21,7 @@ class Avatar extends Entity
     @sprite.animations.add("idle", [1], 20, true)
 
     if !@isRemote
-      @host.game.physics.arcade.enable(@sprite)
+      @game.physics.arcade.enable(@sprite)
       @sprite.body.drag.set(DRAG, DRAG)
       @sprite.body.collideWorldBounds = true
       @sprite.body.bounce.set(0.7,0.7)
@@ -45,7 +45,7 @@ class Avatar extends Entity
     @sprite.kill()
 
   controlledUpdate:->
-    moves = @host.pollController()
+    moves = @game.controller.poll()
 
     @movement.acceleration.set(0, 0)
     @movement.max_velocity.set(MAX_SPEED, MAX_SPEED)
