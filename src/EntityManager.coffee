@@ -14,6 +14,15 @@ class EntityManager
     @idCounter = 0
     @entities = {}
 
+    @game.network.on 'open', (channel, data)=>
+      @sendInitForAllOwnedEntitiesToChannel(channel)
+
+    @game.network.on 'close', (channel, data)=>
+      @removeEntitiesForPeerId(channel.peer)
+
+    @game.network.on 'data', (channel, data)=>
+      @processIncoming(data, channel)
+
   setGroup: (@group)->
 
   getNewId:->
@@ -38,7 +47,7 @@ class EntityManager
 
   addEntity: (type, id, isRemote, owner, state)=>
     entityClass = window[type] # get class from string
-    e = new entityClass(@game, @group, id, isRemote, owner)
+    e = new entityClass(@game, id, isRemote, owner)
     e.setState(state)
     @entities[id] = e
 

@@ -1,4 +1,7 @@
 class SoccerState extends Phaser.State
+  init: ->
+    @game.entityManager.startState()
+
   create: ->
     @spriteGroup = @game.add.group()
     @game.physics.arcade.enable(@spriteGroup)
@@ -8,5 +11,8 @@ class SoccerState extends Phaser.State
 
   update:->
     @game.entityManager.update()
+
+  shutdown:->
+    @game.entityManager.endState()
 
 MusicalSacrifice.SoccerState = SoccerState

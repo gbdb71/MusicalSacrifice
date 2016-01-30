@@ -1,7 +1,7 @@
 class Entity
-  constructor: (@game, @group, @id, @isRemote, @owner)->
+  constructor: (@game, @id, @isRemote, @owner)->
     @lastState = {}
-    
+
     @type = @constructor.name
 
     @init()

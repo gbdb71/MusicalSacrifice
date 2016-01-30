@@ -8,7 +8,7 @@ class Ball extends SingletonEntity
   KICK_MAGNITUDE = 400
 
   init:->
-    @sprite = @group.create(-100,-100, 'ball')
+    @sprite = @game.entityManager.group.create(-100,-100, 'ball')
     @possessorId = null
     @catchable = false
     @kickTime = Date.now()
