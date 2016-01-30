@@ -132,9 +132,9 @@ class Main extends Phaser.State
       if pad.isDown(Phaser.Gamepad.XBOX360_A)
         moves.but2 = true
       if pad.isDown(Phaser.Gamepad.XBOX360_X)
-        moves.but2 = true
+        moves.but3 = true
       if pad.isDown(Phaser.Gamepad.XBOX360_B)
-        moves.but2 = true
+        moves.but4 = true
 
     if @kb.isDown(Phaser.Keyboard.UP)
       moves.up = true
@@ -147,11 +147,11 @@ class Main extends Phaser.State
     if @kb.isDown(Phaser.Keyboard.W)
       moves.but1 = true
     if @kb.isDown(Phaser.Keyboard.S)
-      moves.but1 = true
+      moves.but2 = true
     if @kb.isDown(Phaser.Keyboard.A)
-      moves.but1 = true
+      moves.but3 = true
     if @kb.isDown(Phaser.Keyboard.D)
-      moves.but1 = true
+      moves.but4 = true
 
     moves
 
