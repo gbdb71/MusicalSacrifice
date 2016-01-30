@@ -47,11 +47,9 @@ class Main extends Phaser.State
     @game.stage.backgroundColor = 0x886666;
 
   create: ->
-    @myId = '555'
     @entityManager = null
-
     @spriteGroup = @game.add.group()
-    # @avatar = @generator.pick(['nigel','bruce', 'julie', 'rachel'])
+
     @allPeers = [ ]
     @myPeerId = null
     #@peer = new Peer({ host: 'router.kranzky.com', port: 80, config: { 'iceServers': [] }, debug: 0 })
@@ -90,13 +88,7 @@ class Main extends Phaser.State
           @entityManager.processIncoming(data)
       remote.on 'close', =>
         @allPeers = _.reject @allPeers, (channel)-> channel.peer == remote.peer
-        console.log("TODO remove entity")
-
-  # removeDude:(dudeId)->
-  #   dude = @dudesById[dudeId]
-  #   return if _.isUndefined(dude)
-  #   dude.kill()
-  #   delete @dudesById[dudeId]
+        @entityManager.despawnEntitiesForPeerId(remote.peer)
 
   update:->
     if @entityManager?

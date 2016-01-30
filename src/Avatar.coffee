@@ -25,6 +25,9 @@ class Avatar extends Entity
     y: @sprite.position.y
     anim: @sprite.animations.currentAnim.name
 
+  despawn:->
+    @sprite.kill()
+
   controlledUpdate:->
     moves = @host.pollController()
 

@@ -13,6 +13,7 @@ class Entity
     @controlledUpdate()
     @updateRemotes()
 
+
   updateRemotes: ->
     newState = @getState()
     if !_.isEqual(lastState, newState)
@@ -27,5 +28,7 @@ class Entity
 
   controlledUpdate: ->
     # override to authoratively update state
+
+  despawn: ->
 
 window.Entity = Entity

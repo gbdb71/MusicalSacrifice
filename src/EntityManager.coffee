@@ -28,9 +28,15 @@ class EntityManager
     e.setState(state)
     @entities[id] = e
 
+  despawnEntitiesForPeerId: (peerId)->
+    _.each(@getEntitiesForPeerId(peerId), (entity)=>
+      entity.despawn()
+      delete @entities[entity.id]
+    )
+
   processIncoming:(data)->
     if data.message == "initEntity"
-      @spawnRemoteEntity(data.type, data.id, true, data.state)
+      @spawnRemoteEntity(data.type, data.id, data.state)
     else if data.message == "update"
       entity = @entities[data.id]
       if entity
@@ -62,5 +68,9 @@ class EntityManager
 
   getMyEntities:->
     _.filter(@entities, (entity)-> entity.isRemote == false)
+
+  getEntitiesForPeerId:(peerId)->
+    _.filter(@entities, (entity)-> entity.id.startsWith(peerId))
+
 
 window.EntityManager = EntityManager
