@@ -1,5 +1,6 @@
 #= require Entity
 #= require Avatar
+#= require Ball
 
 class EntityManager
   constructor: (host, hostPeerId)->
@@ -21,10 +22,11 @@ class EntityManager
     console.log("Spawning owned #{type} #{id} #{state}")
     entity = @addEntity(type, id, false, state)
     @broadcastInitEntity(entity)
+    entity
 
-  addEntity: (type, id, isRemote, state)->
+  addEntity: (type, id, isRemote, state)=>
     entityClass = window[type] # get class from string
-    e = new entityClass(@host, id, isRemote, @broadcastEntityState)
+    e = new entityClass(this, id, isRemote, @broadcastEntityState)
     e.setState(state)
     @entities[id] = e
 

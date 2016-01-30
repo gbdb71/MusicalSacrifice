@@ -14,6 +14,7 @@ class Main extends Phaser.State
     @game.load.spritesheet('bruce', 'assets/bruce.png', 32, 32)
     @game.load.spritesheet('julie', 'assets/julie.png', 32, 32)
     @game.load.spritesheet('rachel', 'assets/rachel.png', 32, 32)
+    @game.load.image('ball', 'assets/ball.png')
 
   init: ->
     @game.stage.disableVisibilityChange = true
@@ -57,7 +58,10 @@ class Main extends Phaser.State
       console.info('Starting as peer ' + id)
       @myPeerId = id
       @entityManager = new EntityManager(this, @myPeerId)
-      @entityManager.spawnOwnedEntity('Avatar', {x:400, y:225})
+      # spawn our avatar
+      avatar = @entityManager.spawnOwnedEntity('Avatar', {x:400, y:225})
+      # also spawn a ball for ourselves
+      @entityManager.spawnOwnedEntity('Ball', {x:400, y:225, possessorId: avatar.id})
 
       @peer.listAllPeers (data)=>
         data = _.without(data, @myPeerId)

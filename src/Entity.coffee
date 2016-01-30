@@ -1,10 +1,11 @@
 class Entity
-  constructor: (host, id, isRemote, broadcastStateFn)->
+  constructor: (manager, id, isRemote, broadcastStateFn)->
     @isRemote = isRemote
     @id = id
     @lastState = {}
     @broadcastState = broadcastStateFn
-    @host = host
+    @manager = manager
+    @host = manager.host
     @type = @constructor.name
 
   update: ->
@@ -12,7 +13,6 @@ class Entity
 
     @controlledUpdate()
     @updateRemotes()
-
 
   updateRemotes: ->
     newState = @getState()
