@@ -24,7 +24,7 @@ class Avatar extends Entity
       @host.game.physics.arcade.enable(@sprite)
       @sprite.body.drag.set(DRAG, DRAG)
       @sprite.body.collideWorldBounds = true
-      @sprite.body.bounce.set(0.1,0.1)
+      @sprite.body.bounce.set(0.7,0.7)
 
   setState:(state)->
     @sprite.position.x = state.x

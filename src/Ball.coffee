@@ -56,16 +56,18 @@ class Ball extends Entity
         @sprite.position.x = possessor.sprite.position.x + 10
         @sprite.position.y = possessor.sprite.position.y + 24
 
-      moves = @host.pollController()
-      if (moves.but1)
-        vector = possessor.sprite.body.acceleration.clone().setMagnitude(KICK_MAGNITUDE)
-        @kick(vector)
+        moves = @host.pollController()
+        if (moves.but1)
+          vector = possessor.sprite.body.acceleration.clone().setMagnitude(KICK_MAGNITUDE)
+          @kick(vector)
+
     else if @catchable
       # get all avatars and see if any are overlapping
       avatars = _.filter(@manager.entities, (entity)-> entity.type == "Avatar")
       _.each(avatars, (avatar)=>
         if Phaser.Rectangle.intersects(avatar.sprite.getBounds(), @sprite.getBounds())
           @possessorId = avatar.id
+          @catchable = false
           return
         )
 
