@@ -27,7 +27,7 @@ class Main extends Phaser.State
     console.log(@dudes)
     @cursors = @game.input.keyboard.createCursorKeys()
 
-    @peer = new Peer({ debug: 0, host: 'router.kranzky.com', port: 80 })
+    @peer = new Peer({ debug: 3, host: 'router.kranzky.com', port: 80, config: { 'iceServers': [] } })
 
     @allPeers = []
     @myPeerId = null
