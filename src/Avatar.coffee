@@ -5,10 +5,10 @@ class Avatar extends Entity
     super
 
     @sprite = @host.spriteGroup.create(-100,-100, 'nigel')
-    @sprite.animations.add("down", [0, 1, 2, 1], 20, true)
+    @sprite.animations.add("down", [0, 1, 2, 1], 10, true)
     @sprite.animations.add("left", [4, 5, 6, 5], 10, true)
     @sprite.animations.add("right", [8, 9, 10, 9], 10, true)
-    @sprite.animations.add("up", [12, 13, 14, 13], 20, true)
+    @sprite.animations.add("up", [12, 13, 14, 13], 10, true)
     @sprite.animations.add("idle", [1], 20, true)
 
     if !@isRemote
@@ -28,14 +28,16 @@ class Avatar extends Entity
   controlledUpdate:->
     moves = @host.pollController()
 
+    @sprite.body.acceleration.set(0, 0)
+    @sprite.body.maxVelocity.set(100, 100)
     if (moves.left)
-      @sprite.body.velocity.x = -150
+      @sprite.body.acceleration.x = -1000
     if (moves.right)
-      @sprite.body.velocity.x = 150
+      @sprite.body.acceleration.x = 1000
     if (moves.up)
-      @sprite.body.velocity.y = -150
+      @sprite.body.acceleration.y = -1000
     if (moves.down)
-      @sprite.body.velocity.y = 150
+      @sprite.body.acceleration.y = 1000
 
     anim = "idle"
     if Math.abs(@sprite.body.velocity.x) > Math.abs(@sprite.body.velocity.y)
