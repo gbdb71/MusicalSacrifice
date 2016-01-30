@@ -90,7 +90,7 @@ class Main extends Phaser.State
           console.info('Peer has initialized themselves ' + remote.peer)
           # someone has just told us about them, so create their dude
         # give entity manager a chance to do stuff with each message
-        @entityManager.processIncoming(data)
+        @entityManager.processIncoming(data, remote)
       remote.on 'close', =>
         @allPeers = _.reject @allPeers, (channel)-> channel.peer == remote.peer
         @entityManager.removeEntitiesForPeerId(remote.peer)

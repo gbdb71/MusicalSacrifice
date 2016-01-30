@@ -7,20 +7,21 @@ class Ball extends SingletonEntity
   CATCH_COOLDOWN = 300
   KICK_MAGNITUDE = 400
 
-  constructor: ->
-    super
-
+  init:->
     @sprite = @host.spriteGroup.create(-100,-100, 'ball')
     @possessorId = null
     @catchable = false
     @kickTime = Date.now()
 
-    if !@isRemote
+  onLoseOwnership:->
+    @sprite.body.moves = false
+
+  onGainOwnership:->
+    if !@sprite.body?
       @host.game.physics.arcade.enable(@sprite)
       @sprite.body.drag.set(DRAG, DRAG)
       @sprite.body.collideWorldBounds = true
       @sprite.body.bounce.set(0.9,0.9)
-
 
   kick:(vector)->
     @rolling = true
@@ -68,6 +69,7 @@ class Ball extends SingletonEntity
       _.each(avatars, (avatar)=>
         if Phaser.Rectangle.intersects(avatar.sprite.getBounds(), @sprite.getBounds())
           @possessorId = avatar.id
+          @manager.grantOwnership(this, avatar.owner)
           @catchable = false
           return
         )

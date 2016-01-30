@@ -5,9 +5,7 @@ class Avatar extends Entity
   MAX_SPEED = 200
   DRAG = 200
 
-  constructor: ->
-    super
-
+  init: ->
     @movement =
       acceleration: new Phaser.Point
       max_velocity: new Phaser.Point

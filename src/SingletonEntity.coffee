@@ -1,8 +1,6 @@
 #= require Entity
 
 class SingletonEntity extends Entity
-  constructor: ->
-    super
 
   controlledUpdate:()->
     elderDupes = _.filter(

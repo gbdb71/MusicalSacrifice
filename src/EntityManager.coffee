@@ -14,9 +14,9 @@ class EntityManager
     @idCounter += 1
     @hostPeerId + @idCounter
 
-  spawnRemoteEntity: (type, id, state)->
-    console.log("Spawning remote #{type} #{id} #{state}")
-    @addEntity(type, id, true, state)
+  spawnRemoteEntity: (type, id, owner, state)->
+    console.log("Spawning remote #{type} #{id} #{state} for @{owner}")
+    @addEntity(type, id, true, owner, state)
 
   spawnOwnedEntity: (type, state)->
     if window[type].prototype instanceof SingletonEntity
@@ -26,13 +26,13 @@ class EntityManager
 
     id = @getNewId()
     console.log("Spawning owned #{type} #{id} #{state}")
-    entity = @addEntity(type, id, false, state)
+    entity = @addEntity(type, id, false, @hostPeerId, state)
     @broadcastInitEntity(entity)
     entity
 
-  addEntity: (type, id, isRemote, state)=>
+  addEntity: (type, id, isRemote, owner, state)=>
     entityClass = window[type] # get class from string
-    e = new entityClass(this, id, isRemote, @broadcastEntityState)
+    e = new entityClass(this, id, isRemote, owner)
     e.setState(state)
     @entities[id] = e
 
@@ -45,9 +45,9 @@ class EntityManager
     @entities[entity.id].remove()
     delete @entities[entity.id]
 
-  processIncoming:(data)->
+  processIncoming:(data, remote)->
     if data.message == "initEntity"
-      @spawnRemoteEntity(data.type, data.id, data.state)
+      @spawnRemoteEntity(data.type, data.id, remote.peer, data.state)
     else if data.message == "update"
       entity = @entities[data.id]
       if entity
@@ -55,8 +55,14 @@ class EntityManager
     else if data.message == "despawn"
       entity = @entities[data.id]
       @removeEntity(entity)
+    else if data.message == "grantOwnership"
+      console.log("Received grant ownership message #{data}")
+      entity = @entities[data.id]
+      @onGrantOwnership(entity, data.newOwner)
 
-  broadcastEntityState:(id, state)->
+  broadcastEntityState:(entity)->
+    id = entity.id
+    state = entity._getState()
     @host.broadcastToAllChannels
       message: "update",
       id: id,
@@ -66,6 +72,22 @@ class EntityManager
     @host.broadcastToAllChannels
       message: "despawn",
       id: entity.id
+
+  broadcastGrantOwnership:(entity, newOwner)->
+    @host.broadcastToAllChannels
+      message: "grantOwnership",
+      id: entity.id,
+      newOwner: newOwner
+
+  grantOwnership:(entity, newOwner)->
+    console.log("Granting ownership of #{entity.type} to #{newOwner}")
+    @broadcastGrantOwnership(entity, newOwner)
+    @onGrantOwnership(entity, newOwner)
+
+  onGrantOwnership:(entity, newOwner)->
+    console.log("been told to grant ownership of #{entity.type} #{entity.id} to #{newOwner}")
+    entity.setOwned(newOwner == @hostPeerId)
+    entity.owner = newOwner
 
   despawnEntity:(entity)->
     @broadcastDespawnEntity(entity)
@@ -83,7 +105,7 @@ class EntityManager
     "message": "initEntity",
     "type": entity.type
     "id": entity.id,
-    "state": entity.getState(),
+    "state": entity._getState(),
 
   update:->
     _.each @getMyEntities(), (entity)-> entity.update()
