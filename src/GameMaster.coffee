@@ -8,7 +8,6 @@ class GameMaster extends MS.SingletonEntity
     @currentState = null
     @createdAt = Date.now()
     @started = false
-    @started2 = false
     @level = null
     @levelId = null
 
@@ -16,11 +15,6 @@ class GameMaster extends MS.SingletonEntity
     if Date.now() - @createdAt > DELAY && !@started
       @started = true
       console.log("I SAY WE PLAY SOCCER NOW")
-      @transitionToLevel("Soccer")
-
-    if Date.now() - @createdAt > 20000 && !@started2
-      @started2 = true
-      console.log("I SAY WE PLAY SOCCER AGAIN")
       @transitionToLevel("Soccer")
 
     super
