@@ -9,8 +9,8 @@ class Network
       'close': []
     @allPeers = [ ]
     @myPeerId = null
-    # @peer = new Peer({ host: 'router.kranzky.com', port: 80, config: { 'iceServers': [] }, debug: 0 })
-    @peer = new Peer({ host: 'localhost', port: 9000, config: { 'iceServers': [] }, debug: 0 })
+    @peer = new Peer({ host: 'router.kranzky.com', port: 80, config: { 'iceServers': [] }, debug: 0 })
+    # @peer = new Peer({ host: 'localhost', port: 9000, config: { 'iceServers': [] }, debug: 0 })
 
     @peer.on 'open', (id)=>
       console.info('Starting as peer ' + id)
