@@ -1,0 +1,11 @@
+* figure out how to restrict peer connection to the same LAN
+* build a common game state for levels: prepare, play, celebrate
+  + prepare phase shows instructions, players, countdown
+  + play phase shows countdown, score
+  + celebrate phase focuses on winner
+  + sync state and so on
+  + level controls spawn points and such
+* prevent new players from spawning during a level; process spawns when level inits
+* flesh out the lobby, add player name and team name perhaps (if needed for peer restriction)
+* add speech bubbles with typed messages
+* design six different thematic levels
