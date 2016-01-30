@@ -6,9 +6,7 @@ class Avatar extends Entity
   DRAG = 200
 
   init: ->
-    @movement =
-      acceleration: new Phaser.Point
-      max_velocity: new Phaser.Point
+    @direction = new Phaser.Point(0, 1)
 
     @setSprite()
 
@@ -17,12 +15,16 @@ class Avatar extends Entity
       @sprite.body.drag.set(DRAG, DRAG)
       @sprite.body.collideWorldBounds = true
       @sprite.body.bounce.set(0.7,0.7)
+      @sprite.body.height = 16
+      @sprite.body.width = 20
 
   setSprite: ->
     @skin = @game.generator.pick(@game.sheets)
     @row = @game.generator.pick([0, 1])
     @col = @game.generator.pick([0, 1, 2, 3])
     @sprite = @game.entityManager.group.create(-100,-100, @skin)
+    @sprite.scale.set(2, 2)
+    @sprite.anchor.set(0.5, 1)
     @setAnimations()
 
   setAnimations: ->
@@ -36,7 +38,6 @@ class Avatar extends Entity
     top += 12
     @sprite.animations.add("up", [top, top+1, top+2], 10, true)
     @sprite.animations.play("idle")
-    @sprite.scale.set(2, 2)
 
   setState:(state)->
     @sprite.position.x = state.x
@@ -62,21 +63,24 @@ class Avatar extends Entity
   controlledUpdate:->
     moves = @game.controller.poll()
 
-    @movement.acceleration.set(0, 0)
-    @movement.max_velocity.set(MAX_SPEED, MAX_SPEED)
+    @direction.set(0, 0)
     if (moves.left)
-      @movement.acceleration.x = -1
+      @direction.x = -1
     if (moves.right)
-      @movement.acceleration.x = 1
+      @direction.x = 1
     if (moves.up)
-      @movement.acceleration.y = -1
+      @direction.y = -1
     if (moves.down)
-      @movement.acceleration.y = 1
-    @movement.acceleration.setMagnitude(ACCELERATION)
-    @sprite.body.acceleration = @movement.acceleration
+      @direction.y = 1
+    acceleration = @direction.clone()
+    acceleration.setMagnitude(ACCELERATION)
+    @sprite.body.acceleration = acceleration
+    if @direction.isZero()
+      @direction.y = 1
+    max_velocity = new Phaser.Point(MAX_SPEED, MAX_SPEED)
     if @sprite.body.velocity.getMagnitude() > MAX_SPEED
-      @movement.max_velocity.setMagnitude(MAX_SPEED)
-    @sprite.body.maxVelocity = @movement.max_velocity
+      max_velocity.setMagnitude(MAX_SPEED)
+    @sprite.body.maxVelocity = max_velocity
 
     anim = "idle"
     if Math.abs(@sprite.body.velocity.x) > Math.abs(@sprite.body.velocity.y)

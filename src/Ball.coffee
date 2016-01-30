@@ -9,6 +9,8 @@ class Ball extends SingletonEntity
 
   init:->
     @sprite = @game.entityManager.group.create(-100,-100, 'ball')
+    @sprite.scale.set(2, 2)
+    @sprite.anchor.set(0.5, 0.5)
     @possessorId = null
     @catchable = false
     @kickTime = Date.now()
@@ -56,8 +58,11 @@ class Ball extends SingletonEntity
     if @possessorId?
       possessor = @game.entityManager.entities[@possessorId]
       if possessor?
-        @sprite.position.x = possessor.sprite.position.x + 10
-        @sprite.position.y = possessor.sprite.position.y + 28
+        offset = possessor.direction
+        @sprite.position.x = possessor.sprite.position.x + offset.x * 10
+        @sprite.position.y = possessor.sprite.position.y + offset.y
+        if offset.y < 0
+          @sprite.position.y -= 20
 
         moves = @game.controller.poll()
         if (moves.but1)
