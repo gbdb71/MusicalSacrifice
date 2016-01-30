@@ -49,34 +49,40 @@ class Main extends Phaser.State
 
     @dudes = @game.add.group()
     @avatar = @generator.pick(['nigel','bruce', 'julie', 'rachel'])
-    @player = @addDude(@myId, 0, 0, @avatar)
-    @game.physics.arcade.enable(@player)
+    @player = @addDude(@myId, 400, 225, @avatar)
 
-    @allPeers = []
+    @allPeers = [ ]
     @myPeerId = null
-    @peer = new Peer({ host: 'router.kranzky.com', port: 80, config: { 'iceServers': [] }, debug: 0 })
+    #@peer = new Peer({ host: 'router.kranzky.com', port: 80, config: { 'iceServers': [] }, debug: 0 })
+    @peer = new Peer({ host: 'localhost', port: 9000, config: { 'iceServers': [] }, debug: 0 })
     @peer.on 'open', (id)=>
-      console.log('My peer ID is: ' + id)
+      console.info('Starting as peer ' + id)
       @myPeerId = id
       @peer.listAllPeers (data)=>
         data = _.without(data, @myPeerId)
         @allPeers = _.map data, (peerId) =>
           channel = @peer.connect(peerId)
           channel.on 'open', =>
-            channel.send({message:"arrive", x: 0, y: 0, @avatar})
-            @addDude(channel.peer, data.x, data.y, 'nigel')
+            console.info('Joining peer ' + peerId)
+            channel.send({ message: "arrive", x: @player.body.x, y: @player.body.y, @avatar })
           channel
         console.log('all peers: ' + _.map @allPeers, (channel)->channel.peer )
     @peer.on 'connection', (remote)=>
       remote.on 'data', (data)=>
-        if data.message == "update"
-          @updateDude(remote.peer, data.x, data.y, data.anim)
-        else if data.message == "arrive"
-          console.info(data)
-          channel = @peer.connect remote.peer
-          @allPeers.push(channel)
-          console.log('all peers: ' + _.map @allPeers, (channel)->channel.peer)
+        if data.message == "arrive"
+          console.info('Remote peer has arrived ' + remote.peer)
           @addDude(remote.peer, data.x, data.y, data.avatar)
+          channel = @peer.connect remote.peer
+          channel.on 'open', =>
+            console.info('Initializing ourselves on peer ' + remote.peer)
+            channel.send({ message: "initEntity", x: @player.body.x, y: @player.body.y, @avatar })
+            @allPeers.push(channel)
+        else if data.message == "initEntity"
+          console.info('Peer has initialized themselves ' + remote.peer)
+          # someone has just told us about them, so create their dude
+          @addDude(remote.peer, data.x, data.y, data.avatar)
+        else if data.message == "update"
+          @updateDude(remote.peer, data.x, data.y, data.anim)
       remote.on 'close', =>
         @allPeers = _.reject @allPeers, (channel)-> channel.peer == remote.peer
         @removeDude(remote.peer)
@@ -90,15 +96,18 @@ class Main extends Phaser.State
     dude.animations.add("up", [12, 13, 14, 13], 20, true)
     dude.animations.add("idle", [1], 20, true)
     @dudesById[dudeId] = dude
+    @game.physics.arcade.enable(dude)
     dude
 
   removeDude:(dudeId)->
     dude = @dudesById[dudeId]
+    return if _.isUndefined(dude)
     dude.kill()
     delete @dudesById[dudeId]
 
   updateDude:(dudeId, x, y, anim)->
     dude = @dudesById[dudeId]
+    return if _.isUndefined(dude)
     dude.position.x = x
     dude.position.y = y
     dude.animations.play(anim)
