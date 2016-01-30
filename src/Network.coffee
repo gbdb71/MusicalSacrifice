@@ -1,3 +1,5 @@
+#= require PeerHeartbeater
+
 MS = window.MusicalSacrifice
 
 class Network
@@ -11,6 +13,8 @@ class Network
     @myPeerId = null
     @peer = new Peer({ host: 'router.kranzky.com', port: 80, config: { 'iceServers': [] }, debug: 0 })
     # @peer = new Peer({ host: 'localhost', port: 9000, config: { 'iceServers': [] }, debug: 0 })
+
+    window.makePeerHeartbeater(@peer)
 
     @peer.on 'open', (id)=>
       console.info('Starting as peer ' + id)
