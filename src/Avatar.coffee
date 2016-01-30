@@ -20,10 +20,13 @@ class Avatar extends Entity
 
   setSprite: ->
     @skin = @game.generator.pick(@game.sheets)
-    row = @game.generator.pick([0, 1])
-    col = @game.generator.pick([0, 1, 2, 3])
+    @row = @game.generator.pick([0, 1])
+    @col = @game.generator.pick([0, 1, 2, 3])
     @sprite = @game.entityManager.group.create(-100,-100, @skin)
-    top = row*48 + col*3
+    @setAnimations()
+
+  setAnimations: ->
+    top = @row*48 + @col*3
     @sprite.animations.add("idle", [top + 1], 10, true)
     @sprite.animations.add("down", [top, top+1, top+2], 10, true)
     top += 12
@@ -40,14 +43,17 @@ class Avatar extends Entity
     @sprite.position.y = state.y
     if @sprite.animations.currentAnim.name != state.anim
       @sprite.animations.play(state.anim)
-    if state.skin && @skin != state.skin
-      @skin = state.skin
+    if state.skin && (@skin != state.skin[0] || @row != state.skin[1] || @col != state.skin[2])
+      @skin = state.skin[0]
+      @row = state.skin[1]
+      @col = state.skin[2]
       @sprite.loadTexture(@skin)
+      @setAnimations()
 
   getState:(state)->
     x: @sprite.position.x,
     y: @sprite.position.y,
-    skin: @skin,
+    skin: [@skin, @row, @col],
     anim: @sprite.animations.currentAnim.name
 
   remove:->
