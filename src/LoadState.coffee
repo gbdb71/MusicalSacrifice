@@ -22,6 +22,7 @@ class LoadState extends Phaser.State
     _.each SHEETS, (name)=>
       @game.load.spritesheet(name, 'assets/' + name + '.png', 26, 36)
     @game.load.image('ball', 'assets/ball.png')
+    @game.load.image('soccer', 'assets/soccer.jpg')
 
   loadUpdate:->
     @progress = @game.load.progress
