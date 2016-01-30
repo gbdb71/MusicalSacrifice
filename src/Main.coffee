@@ -8,6 +8,28 @@ class Main extends Phaser.State
     new Phaser.Game(800, 450, mode, @parent, this, false, false, null)
 
   init: ->
+    @game.physics.startSystem(Phaser.Physics.ARCADE)
+
+    @game.input.gamepad.start
+    @pads = [
+      @game.input.gamepad.pad1,
+      @game.input.gamepad.pad2,
+      @game.input.gamepad.pad3,
+      @game.input.gamepad.pad4
+    ]
+
+    @kb = @game.input.keyboard
+    @kb.addKeyCapture([
+      Phaser.Keyboard.W,
+      Phaser.Keyboard.A,
+      Phaser.Keyboard.S,
+      Phaser.Keyboard.D,
+      Phaser.Keyboard.UP,
+      Phaser.Keyboard.DOWN,
+      Phaser.Keyboard.LEFT,
+      Phaser.Keyboard.RIGHT,
+    ])
+
     @game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL
     @game.scale.pageAlignVertically = true
     @game.scale.pageAlignHorizontally = true
@@ -17,8 +39,6 @@ class Main extends Phaser.State
   create: ->
     @dudesById = {}
     @myId = '555'
-
-    @game.physics.startSystem(Phaser.Physics.ARCADE)
 
     @dudes = @game.add.group()
     @player = @addDude(@myId, 0, 0, 'nigel')
@@ -63,10 +83,11 @@ class Main extends Phaser.State
   addDude:(dudeId, x, y)->
     dude = @dudes.create(x, y, 'nigel')
     dude.animations.frame = 1
-    dude.animations.add("down", [0, 1, 2, 1], 10, true)
-    dude.animations.add("left", [4, 5, 6, 5], 20, true)
+    dude.animations.add("down", [0, 1, 2, 1], 20, true)
+    dude.animations.add("left", [4, 5, 6, 5], 10, true)
     dude.animations.add("right", [8, 9, 10, 9], 10, true)
     dude.animations.add("up", [12, 13, 14, 13], 20, true)
+    dude.animations.add("idle", [1], 20, true)
     @dudesById[dudeId] = dude
     dude
 
@@ -81,28 +102,89 @@ class Main extends Phaser.State
     dude.position.y = y
 
   update:->
-    @player.body.velocity.x = 0
-
-    if (@cursors.left.isDown)
+    moves = @pollController()
+    if (moves.left)
       @player.body.velocity.x = -150
-      @player.animations.play('left')
-    else if (@cursors.right.isDown)
+    if (moves.right)
       @player.body.velocity.x = 150
-      @player.animations.play('right')
-    else if (@cursors.up.isDown)
+    if (moves.up)
       @player.body.velocity.y = -150
-      @player.animations.play('up')
-    else if (@cursors.down.isDown)
+    if (moves.down)
       @player.body.velocity.y = 150
-      @player.animations.play('down')
-    else
-      @player.animations.stop()
-      @player.frame = 4
 
-    @player.body.velocity.x *= 0.5
-    @player.body.velocity.y *= 0.5
+    animation = "idle"
+    if Math.abs(@player.body.velocity.x) > Math.abs(@player.body.velocity.y)
+      if @player.body.velocity.x > 25
+        animation = "right"
+      else if @player.body.velocity.x < -25
+        animation = "left"
+    else
+      if @player.body.velocity.y > 25
+        animation = "down"
+      else if @player.body.velocity.y < -25
+        animation = "up"
+    @player.animations.play(animation)
+
+    @player.body.velocity.x *= 0.95
+    @player.body.velocity.y *= 0.95
 
     @sendUpdate(@myId, @player.body.x, @player.body.y)
+
+  pollController:=>
+    moves =
+      up: false
+      down: false
+      left: false
+      right: false
+      but1: false
+      but2: false
+      but3: false
+      but4: false
+
+#   _.each @pads, (pad)=>
+#     if pad.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_Y) < -0.8 or
+#        pad.axis(Phaser.Gamepad.XBOX360_STICK_RIGHT_Y) < -0.8 or
+#        pad.isDown(Phaser.Gamepad.XBOX360_DPAD_UP)
+#       moves.up = true
+#     if pad.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_Y) > 0.8
+#        pad.axis(Phaser.Gamepad.XBOX360_STICK_RIGHT_Y) > 0.8 or
+#        pad.isDown(Phaser.Gamepad.XBOX360_DPAD_DOWN)
+#       moves.down = true
+#     if pad.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_X) < -0.8
+#        pad.axis(Phaser.Gamepad.XBOX360_STICK_RIGHT_X) < -0.8 or
+#        pad.isDown(Phaser.Gamepad.XBOX360_DPAD_LEFT)
+#       moves.left = true
+#     if pad.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_X) > 0.8
+#        pad.axis(Phaser.Gamepad.XBOX360_STICK_RIGHT_X) > 0.8 or
+#        pad.isDown(Phaser.Gamepad.XBOX360_DPAD_RIGHT)
+#       moves.right = true
+#     if pad.isDown(Phaser.Gamepad.XBOX360_Y)
+#       moves.but1 = true
+#     if pad.isDown(Phaser.Gamepad.XBOX360_A)
+#       moves.but2 = true
+#     if pad.isDown(Phaser.Gamepad.XBOX360_X)
+#       moves.but2 = true
+#     if pad.isDown(Phaser.Gamepad.XBOX360_B)
+#       moves.but2 = true
+
+    if @kb.isDown(Phaser.Keyboard.UP)
+      moves.up = true
+    if @kb.isDown(Phaser.Keyboard.DOWN)
+      moves.down = true
+    if @kb.isDown(Phaser.Keyboard.LEFT)
+      moves.left = true
+    if @kb.isDown(Phaser.Keyboard.RIGHT)
+      moves.right = true
+    if @kb.isDown(Phaser.Keyboard.W)
+      moves.but1 = true
+    if @kb.isDown(Phaser.Keyboard.S)
+      moves.but1 = true
+    if @kb.isDown(Phaser.Keyboard.A)
+      moves.but1 = true
+    if @kb.isDown(Phaser.Keyboard.D)
+      moves.but1 = true
+
+    moves
 
   sendUpdate:(id, x, y) ->
     _.each @allPeers, (connection)->
@@ -111,13 +193,6 @@ class Main extends Phaser.State
   destroy:->
 
   preload:->
-    @game.input.gamepad.start
-    @pads = [
-      @game.input.gamepad.pad1,
-      @game.input.gamepad.pad2,
-      @game.input.gamepad.pad3,
-      @game.input.gamepad.pad4
-    ]
     @game.load.spritesheet('nigel', 'assets/nigel.png', 32, 32)
 
   loadRender:->
