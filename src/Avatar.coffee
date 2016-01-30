@@ -1,9 +1,9 @@
 #= require Entity
 
 class Avatar extends Entity
-  ACCELERATION = 500
+  ACCELERATION = 600
   MAX_SPEED = 200
-  DRAG = 100
+  DRAG = 200
 
   constructor: ->
     super
@@ -23,6 +23,8 @@ class Avatar extends Entity
     if !@isRemote
       @host.game.physics.arcade.enable(@sprite)
       @sprite.body.drag.set(DRAG, DRAG)
+      @sprite.body.collideWorldBounds = true
+      @sprite.body.bounce.set(0.1,0.1)
 
   setState:(state)->
     @sprite.position.x = state.x

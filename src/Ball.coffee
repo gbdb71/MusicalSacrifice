@@ -4,6 +4,8 @@ class Ball extends Entity
   ACCELERATION = 500
   MAX_SPEED = 200
   DRAG = 200
+  CATCH_COOLDOWN = 300
+  KICK_MAGNITUDE = 400
 
   constructor: ->
     super
@@ -16,6 +18,9 @@ class Ball extends Entity
     if !@isRemote
       @host.game.physics.arcade.enable(@sprite)
       @sprite.body.drag.set(DRAG, DRAG)
+      @sprite.body.collideWorldBounds = true
+      @sprite.body.bounce.set(0.9,0.9)
+
 
   kick:(vector)->
     @rolling = true
@@ -53,12 +58,18 @@ class Ball extends Entity
 
       moves = @host.pollController()
       if (moves.but1)
-        vector = possessor.sprite.body.acceleration.clone().setMagnitude(500)
+        vector = possessor.sprite.body.acceleration.clone().setMagnitude(KICK_MAGNITUDE)
         @kick(vector)
+    else if @catchable
+      # get all avatars and see if any are overlapping
+      avatars = _.filter(@manager.entities, (entity)-> entity.type == "Avatar")
+      _.each(avatars, (avatar)=>
+        if Phaser.Rectangle.intersects(avatar.sprite.getBounds(), @sprite.getBounds())
+          @possessorId = avatar.id
+          return
+        )
 
+    @catchable = @getTimeSinceKick() > CATCH_COOLDOWN
 
-    @catchable = @getTimeSinceKick() > 0.5
-
-    #follow another entity
 
 window.Ball = Ball

@@ -49,6 +49,7 @@ class Main extends Phaser.State
   create: ->
     @entityManager = null
     @spriteGroup = @game.add.group()
+    @game.physics.arcade.enable(@spriteGroup)
 
     @allPeers = [ ]
     @myPeerId = null
