@@ -15,7 +15,7 @@ class LoadState extends Phaser.State
     @graphics = @game.add.graphics(0, 0)
     @graphics.lineStyle(1, 0x5588cc, 1)
     @graphics.drawRect(100, 339, 600, 22)
-    @prograss = 0
+    @progress = 0
     @game.sheets = SHEETS
 
   preload:->
