@@ -1,10 +1,13 @@
 class Entity
-  constructor: (@game, @group, id, isRemote, broadcastStateFn)->
-    @isRemote = isRemote
-    @id = id
+  constructor: (@game, @group, @id, @isRemote, @owner)->
     @lastState = {}
-    @broadcastState = broadcastStateFn
+    
     @type = @constructor.name
+
+    @init()
+
+    if !@isRemote
+      @onGainOwnership()
 
   update: ->
     return if @isRemote
@@ -15,18 +18,36 @@ class Entity
   updateRemotes: ->
     newState = @getState()
     if !_.isEqual(lastState, newState)
-      @broadcastState(@id, newState)
+      @game.entityManager.broadcastEntityState(@)
       lastState = newState
 
-  getState: ->
-    {}
+  setOwned:(owned)->
+    # ifhese are equal then ownership has changed
+    if owned == @isRemote
+      @isRemote = !owned
+      if owned
+        console.log("We gained ownership of #{@type} #{@id}")
+        @onGainOwnership()
+      else
+        console.log("We lost ownership of #{@type} #{@id}")
+        @onLoseOwnership()
 
-  setState:(state) ->
+  _getState: ->
+    _.extend(@getState(), {owner: @owner})
+
+  _setState:(state) ->
     # override to apply received state to entity
 
   controlledUpdate: ->
     # override to authoratively update state
 
-  despawn: ->
+  remove: ->
+
+  init: ->
+
+  onGainOwnership: ->
+
+  onLoseOwnership: ->
+
 
 window.Entity = Entity
