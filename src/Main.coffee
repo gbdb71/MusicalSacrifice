@@ -7,8 +7,15 @@ class Main extends Phaser.State
     mode = if debug then Phaser.CANVAS else Phaser.AUTO
     new Phaser.Game(800, 450, mode, @parent, this, false, false, null)
 
+  preload:->
+    @game.load.spritesheet('nigel', 'assets/nigel.png', 32, 32)
+    @game.load.spritesheet('bruce', 'assets/bruce.png', 32, 32)
+    @game.load.spritesheet('julie', 'assets/julie.png', 32, 32)
+    @game.load.spritesheet('rachel', 'assets/rachel.png', 32, 32)
+
   init: ->
     @game.physics.startSystem(Phaser.Physics.ARCADE)
+    @generator = new Phaser.RandomDataGenerator([(new Date()).getTime()])
 
     @game.input.gamepad.start
     @pads = [
@@ -41,16 +48,13 @@ class Main extends Phaser.State
     @myId = '555'
 
     @dudes = @game.add.group()
-    @player = @addDude(@myId, 0, 0, 'nigel')
-
+    @avatar = @generator.pick(['nigel','bruce', 'julie', 'rachel'])
+    @player = @addDude(@myId, 0, 0, @avatar)
     @game.physics.arcade.enable(@player)
-    console.log(@dudes)
-    @cursors = @game.input.keyboard.createCursorKeys()
-
-    @peer = new Peer({ host: 'router.kranzky.com', port: 80, config: { 'iceServers': [] }, debug: 0 })
 
     @allPeers = []
     @myPeerId = null
+    @peer = new Peer({ host: 'router.kranzky.com', port: 80, config: { 'iceServers': [] }, debug: 0 })
     @peer.on 'open', (id)=>
       console.log('My peer ID is: ' + id)
       @myPeerId = id
@@ -59,13 +63,10 @@ class Main extends Phaser.State
         @allPeers = _.map data, (peerId) =>
           channel = @peer.connect(peerId)
           channel.on 'open', =>
-            channel.send({message:"arrive"})
+            channel.send({message:"arrive", x: 0, y: 0, @avatar})
             @addDude(channel.peer, data.x, data.y, 'nigel')
           channel
-
         console.log('all peers: ' + _.map @allPeers, (channel)->channel.peer )
-
-
     @peer.on 'connection', (remote)=>
       remote.on 'data', (data)=>
         if data.message == "update"
@@ -75,7 +76,7 @@ class Main extends Phaser.State
           channel = @peer.connect remote.peer
           @allPeers.push(channel)
           console.log('all peers: ' + _.map @allPeers, (channel)->channel.peer)
-          @addDude(remote.peer, data.x, data.y, 'nigel')
+          @addDude(remote.peer, data.x, data.y, data.avatar)
       remote.on 'close', =>
         @allPeers = _.reject @allPeers, (channel)-> channel.peer == remote.peer
         @removeDude(remote.peer)
@@ -126,8 +127,8 @@ class Main extends Phaser.State
         anim = "up"
     @player.animations.play(anim)
 
-    @player.body.velocity.x *= 0.95
-    @player.body.velocity.y *= 0.95
+    @player.body.velocity.x *= 0.9
+    @player.body.velocity.y *= 0.9
 
     @sendUpdate(@myId, @player.body.x, @player.body.y, anim)
 
@@ -192,9 +193,6 @@ class Main extends Phaser.State
       connection.send({message: "update", x: x, y: y, anim: anim})
 
   destroy:->
-
-  preload:->
-    @game.load.spritesheet('nigel', 'assets/nigel.png', 32, 32)
 
   loadRender:->
 
