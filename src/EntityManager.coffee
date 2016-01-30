@@ -1,4 +1,5 @@
 #= require Entity
+#= require SingletonEntity
 #= require Avatar
 #= require Ball
 
@@ -18,6 +19,11 @@ class EntityManager
     @addEntity(type, id, true, state)
 
   spawnOwnedEntity: (type, state)->
+    if window[type].prototype instanceof SingletonEntity
+      if @getEntitiesOfType(type).length > 0
+        console.log("Skipping spawning singleton type #{type} because prior exist")
+        return
+
     id = @getNewId()
     console.log("Spawning owned #{type} #{id} #{state}")
     entity = @addEntity(type, id, false, state)
@@ -30,11 +36,14 @@ class EntityManager
     e.setState(state)
     @entities[id] = e
 
-  despawnEntitiesForPeerId: (peerId)->
+  removeEntitiesForPeerId: (peerId)->
     _.each(@getEntitiesForPeerId(peerId), (entity)=>
-      entity.despawn()
-      delete @entities[entity.id]
+      @removeEntity(entity)
     )
+
+  removeEntity:(entity)->
+    @entities[entity.id].remove()
+    delete @entities[entity.id]
 
   processIncoming:(data)->
     if data.message == "initEntity"
@@ -43,13 +52,24 @@ class EntityManager
       entity = @entities[data.id]
       if entity
         entity.setState(data.state)
+    else if data.message == "despawn"
+      entity = @entities[data.id]
+      @removeEntity(entity)
 
   broadcastEntityState:(id, state)->
-    @host.broadcastToAllChannels({
-      "message": "update",
-      "id": id,
-      "state": state
-    })
+    @host.broadcastToAllChannels
+      message: "update",
+      id: id,
+      state: state
+
+  broadcastDespawnEntity:(entity)->
+    @host.broadcastToAllChannels
+      message: "despawn",
+      id: entity.id
+
+  despawnEntity:(entity)->
+    @broadcastDespawnEntity(entity)
+    @removeEntity(entity)
 
   broadcastInitEntity:(entity)->
     @host.broadcastToAllChannels @getInitEntityMessage(entity)
@@ -74,5 +94,7 @@ class EntityManager
   getEntitiesForPeerId:(peerId)->
     _.filter(@entities, (entity)-> entity.id.startsWith(peerId))
 
+  getEntitiesOfType:(type)->
+    _.filter(@entities, (entity)-> entity.type == type)
 
 window.EntityManager = EntityManager

@@ -1,6 +1,6 @@
-#= require Entity
+#= require SingletonEntity
 
-class Ball extends Entity
+class Ball extends SingletonEntity
   ACCELERATION = 500
   MAX_SPEED = 200
   DRAG = 200
@@ -46,15 +46,16 @@ class Ball extends Entity
     possessorId: @possessorId
     catchable: @catchable
 
-  despawn: ->
+  remove: ->
     @sprite.kill()
 
   controlledUpdate:->
+    super
     if @possessorId?
       possessor = @manager.entities[@possessorId]
       if possessor?
         @sprite.position.x = possessor.sprite.position.x + 10
-        @sprite.position.y = possessor.sprite.position.y + 24
+        @sprite.position.y = possessor.sprite.position.y + 28
 
         moves = @host.pollController()
         if (moves.but1)
@@ -63,7 +64,7 @@ class Ball extends Entity
 
     else if @catchable
       # get all avatars and see if any are overlapping
-      avatars = _.filter(@manager.entities, (entity)-> entity.type == "Avatar")
+      avatars = @manager.getEntitiesOfType("Avatar")
       _.each(avatars, (avatar)=>
         if Phaser.Rectangle.intersects(avatar.sprite.getBounds(), @sprite.getBounds())
           @possessorId = avatar.id

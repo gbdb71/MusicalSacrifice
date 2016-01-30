@@ -41,7 +41,7 @@ class Avatar extends Entity
     skin: @skin,
     anim: @sprite.animations.currentAnim.name
 
-  despawn:->
+  remove:->
     @sprite.kill()
 
   controlledUpdate:->

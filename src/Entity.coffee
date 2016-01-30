@@ -29,6 +29,6 @@ class Entity
   controlledUpdate: ->
     # override to authoratively update state
 
-  despawn: ->
+  remove: ->
 
 window.Entity = Entity

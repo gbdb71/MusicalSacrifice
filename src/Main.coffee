@@ -53,16 +53,18 @@ class Main extends Phaser.State
 
     @allPeers = [ ]
     @myPeerId = null
-    @peer = new Peer({ host: 'router.kranzky.com', port: 80, config: { 'iceServers': [] }, debug: 0 })
-    #@peer = new Peer({ host: 'localhost', port: 9000, config: { 'iceServers': [] }, debug: 0 })
+    # @peer = new Peer({ host: 'router.kranzky.com', port: 80, config: { 'iceServers': [] }, debug: 0 })
+    @peer = new Peer({ host: 'localhost', port: 9000, config: { 'iceServers': [] }, debug: 0 })
     @peer.on 'open', (id)=>
       console.info('Starting as peer ' + id)
       @myPeerId = id
       @entityManager = new EntityManager(this, @myPeerId)
       # spawn our avatar
       avatar = @entityManager.spawnOwnedEntity('Avatar', {x:400, y:225})
-      # also spawn a ball for ourselves
-      @entityManager.spawnOwnedEntity('Ball', {x:400, y:225, possessorId: avatar.id})
+      # also spawn a ball for ourselves after a moment
+      window.setTimeout( =>
+        @entityManager.spawnOwnedEntity('Ball', {x:400, y:225, possessorId: avatar.id})
+      , 250)
 
       @peer.listAllPeers (data)=>
         data = _.without(data, @myPeerId)
@@ -87,14 +89,14 @@ class Main extends Phaser.State
         else if data.message == "initEntity"
           console.info('Peer has initialized themselves ' + remote.peer)
           # someone has just told us about them, so create their dude
-          @entityManager.processIncoming(data)
-        else if data.message == "update"
-          @entityManager.processIncoming(data)
+        # give entity manager a chance to do stuff with each message
+        @entityManager.processIncoming(data)
       remote.on 'close', =>
         @allPeers = _.reject @allPeers, (channel)-> channel.peer == remote.peer
-        @entityManager.despawnEntitiesForPeerId(remote.peer)
+        @entityManager.removeEntitiesForPeerId(remote.peer)
 
   update:->
+    @spriteGroup.sort('y', Phaser.Group.SORT_ASCENDING);
     if @entityManager?
       @entityManager.update()
 
