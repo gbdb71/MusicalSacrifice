@@ -12,11 +12,11 @@ class Entity
     if !@isRemote
       @onGainOwnership()
 
-  update: ->
+  update:(send)->
     return if @isRemote
 
     @controlledUpdate()
-    @updateRemotes()
+    @updateRemotes() if send
 
   updateRemotes: ->
     newState = @getState()

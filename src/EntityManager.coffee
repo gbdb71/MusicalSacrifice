@@ -8,11 +8,13 @@ MS = window.MusicalSacrifice
 
 class EntityManager
   DELAY = 5000
+  FREQUENCY = 100
   constructor: (@game)->
     @idCounter = 0
     @entities = {}
     @level = null
     @newLevel = null
+    @epoch = null
 
     @game.network.on 'open', (channel, data)=>
       @sendInitForAllOwnedEntitiesToPeer(channel.peer, null)
@@ -165,7 +167,15 @@ class EntityManager
     "state": entity.getState(),
 
   update:->
-    _.each @getMyEntities(), (entity)-> entity.update()
+    now = @game.time.now
+    if !@epoch
+      @epoch = now - FREQUENCY
+    elapsed = now - @epoch
+    send = false
+    if elapsed > FREQUENCY
+      send = true
+      @epoch += FREQUENCY
+    _.each @getMyEntities(), (entity)-> entity.update(send)
 
   getMyEntities:->
     _.filter(@entities, (entity)-> entity.isRemote == false)
