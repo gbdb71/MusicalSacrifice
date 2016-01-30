@@ -63,6 +63,7 @@ class EntityManager
     )
 
   removeEntity:(entity)->
+    return if !entity
     console.log("removing entity: #{entity.type} #{entity.name}")
     @entities[entity.id].remove()
     delete @entities[entity.id]
@@ -135,6 +136,8 @@ class EntityManager
     entity.owner = newOwner
 
   despawnEntity:(entity)->
+    return if !entity
+
     console.log("despawning entity: #{entity.type} #{entity.name}")
     @broadcastDespawnEntity(entity)
     @removeEntity(entity)
