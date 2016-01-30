@@ -5,6 +5,7 @@ class Entity
     @lastState = {}
 
     @type = @constructor.name
+    @forLevel = null
 
     @init()
 
@@ -19,9 +20,9 @@ class Entity
 
   updateRemotes: ->
     newState = @getState()
-    if !_.isEqual(lastState, newState)
+    if !_.isEqual(@lastState, newState)
       @game.entityManager.broadcastEntityState(@)
-      lastState = newState
+      @lastState = newState
 
   setOwned:(owned)->
     # if these are equal then ownership has changed

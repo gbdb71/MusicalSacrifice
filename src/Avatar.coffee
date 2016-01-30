@@ -28,7 +28,7 @@ class Avatar extends MS.Entity
   setState:(state)->
     @sprite.position.x = state.x
     @sprite.position.y = state.y
-    if @sprite.animations.currentAnim.name != state.anim
+    if @sprite.animations.currentAnim? && @sprite.animations.currentAnim.name != state.anim
       @sprite.animations.play(state.anim)
     if state.skin && @skin != state.skin
       @skin = state.skin
@@ -38,12 +38,14 @@ class Avatar extends MS.Entity
     x: @sprite.position.x,
     y: @sprite.position.y,
     skin: @skin,
-    anim: @sprite.animations.currentAnim.name
+    anim: @sprite.animations.currentAnim?.name
 
   remove:->
     @sprite.kill()
 
   controlledUpdate:->
+    return unless @sprite.alive
+
     moves = @game.controller.poll()
 
     @movement.acceleration.set(0, 0)

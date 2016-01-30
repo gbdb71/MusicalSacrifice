@@ -6,7 +6,7 @@ class SingletonEntity extends MS.Entity
   controlledUpdate:()->
     elderDupes = _.filter(
       @game.entityManager.getEntitiesOfType(@type), (dupe)=>
-        dupe.id < @id
+        dupe.id < @id && dupe.forLevel == @forLevel
     )
 
     # if there are any entities of the same type that are elder than us

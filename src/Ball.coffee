@@ -53,6 +53,7 @@ class Ball extends MS.SingletonEntity
     @sprite.kill()
 
   controlledUpdate:->
+    return unless @sprite.alive
     if @possessorId?
       possessor = @game.entityManager.entities[@possessorId]
       if possessor?

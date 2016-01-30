@@ -8,14 +8,21 @@ class GameMaster extends MS.SingletonEntity
     @currentState = null
     @createdAt = Date.now()
     @started = false
+    @started2 = false
     @level = null
+    @levelId = null
 
   controlledUpdate:->
     if Date.now() - @createdAt > DELAY && !@started
       @started = true
       console.log("I SAY WE PLAY SOCCER NOW")
-      @level = "Soccer"
-      @transitionLevelIfRequired()
+      @transitionToLevel("Soccer")
+
+    if Date.now() - @createdAt > 20000 && !@started2
+      @started2 = true
+      console.log("I SAY WE PLAY SOCCER AGAIN")
+      @transitionToLevel("Soccer")
+
     super
 
   onGainOwnership: ->
@@ -23,13 +30,27 @@ class GameMaster extends MS.SingletonEntity
 
   getState:->
     level: @level
+    levelId: @levelId
 
   setState:(state)->
     @level = state.level
-    @transitionLevelIfRequired()
+    oldLevelId = @levelId
+    @levelId = state.levelId
+    if oldLevelId != @levelId
+      @followToLevel()
 
-  transitionLevelIfRequired:->
-    if @level? && @game.state.current != @level
+  followToLevel:->
+    if @level
+      console.log("Following to level: #{@levelId}")
+      @game.entityManager.startLevel(@levelId)
+      @game.state.start(@level)
+
+  transitionToLevel:(level)->
+    if level
+      @level = level
+      @levelId = @level + Date.now()
+      console.log("Moving to level: #{@levelId}")
+      @game.entityManager.startLevel(@levelId)
       @game.state.start(@level)
 
 
