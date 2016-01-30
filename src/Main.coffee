@@ -15,6 +15,7 @@ class Main extends Phaser.State
 
   init: ->
     @game.physics.startSystem(Phaser.Physics.ARCADE)
+    @game.stage.disableVisibilityChange = true
     @generator = new Phaser.RandomDataGenerator([(new Date()).getTime()])
 
     @game.input.gamepad.start
@@ -50,6 +51,7 @@ class Main extends Phaser.State
     @dudes = @game.add.group()
     @avatar = @generator.pick(['nigel','bruce', 'julie', 'rachel'])
     @player = @addDude(@myId, 400, 225, @avatar)
+    @game.physics.arcade.enable(@player)
 
     @allPeers = [ ]
     @myPeerId = null
@@ -64,14 +66,14 @@ class Main extends Phaser.State
           channel = @peer.connect(peerId)
           channel.on 'open', =>
             console.info('Joining peer ' + peerId)
-            channel.send({ message: "arrive", x: @player.body.x, y: @player.body.y, @avatar })
+            channel.send({ message: "arrive" })
+            channel.send({ message: "initEntity", x: @player.body.x, y: @player.body.y, @avatar })
           channel
         console.log('all peers: ' + _.map @allPeers, (channel)->channel.peer )
     @peer.on 'connection', (remote)=>
       remote.on 'data', (data)=>
         if data.message == "arrive"
           console.info('Remote peer has arrived ' + remote.peer)
-          @addDude(remote.peer, data.x, data.y, data.avatar)
           channel = @peer.connect remote.peer
           channel.on 'open', =>
             console.info('Initializing ourselves on peer ' + remote.peer)
@@ -89,14 +91,12 @@ class Main extends Phaser.State
 
   addDude:(dudeId, x, y, sprite)->
     dude = @dudes.create(x, y, sprite)
-    dude.animations.frame = 1
     dude.animations.add("down", [0, 1, 2, 1], 20, true)
     dude.animations.add("left", [4, 5, 6, 5], 10, true)
     dude.animations.add("right", [8, 9, 10, 9], 10, true)
     dude.animations.add("up", [12, 13, 14, 13], 20, true)
     dude.animations.add("idle", [1], 20, true)
     @dudesById[dudeId] = dude
-    @game.physics.arcade.enable(dude)
     dude
 
   removeDude:(dudeId)->
@@ -110,7 +110,8 @@ class Main extends Phaser.State
     return if _.isUndefined(dude)
     dude.position.x = x
     dude.position.y = y
-    dude.animations.play(anim)
+    if dude.animations.currentAnim.name != anim
+      dude.animations.play(anim)
 
   update:->
     moves = @pollController()
@@ -134,7 +135,8 @@ class Main extends Phaser.State
         anim = "down"
       else if @player.body.velocity.y < -25
         anim = "up"
-    @player.animations.play(anim)
+    if @player.animations.currentAnim.name != anim
+      @player.animations.play(anim)
 
     @player.body.velocity.x *= 0.9
     @player.body.velocity.y *= 0.9
