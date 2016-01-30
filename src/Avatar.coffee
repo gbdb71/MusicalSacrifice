@@ -1,8 +1,17 @@
 #= require Entity
 
 class Avatar extends Entity
+  ACCELERATION = 500
+  MAX_SPEED = 200
+  DRAG = 100
+
   constructor: ->
     super
+
+    @movement =
+      acceleration: new Phaser.Point
+      max_velocity: new Phaser.Point
+
     @skin = @host.generator.pick(['nigel','bruce', 'julie', 'rachel'])
     @sprite = @host.spriteGroup.create(-100,-100, @skin)
     @sprite.animations.add("down", [0, 1, 2, 1], 10, true)
@@ -19,6 +28,7 @@ class Avatar extends Entity
     @sprite.position.y = state.y
     if @sprite.animations.currentAnim.name != state.anim
       @sprite.animations.play(state.anim)
+      @sprite.body.drag.set(DRAG, DRAG)
     if state.skin && @skin != state.skin
       @skin = state.skin
       @sprite.loadTexture(@skin)
@@ -35,16 +45,21 @@ class Avatar extends Entity
   controlledUpdate:->
     moves = @host.pollController()
 
-    @sprite.body.acceleration.set(0, 0)
-    @sprite.body.maxVelocity.set(100, 100)
+    @movement.acceleration.set(0, 0)
+    @movement.max_velocity.set(MAX_SPEED, MAX_SPEED)
     if (moves.left)
-      @sprite.body.acceleration.x = -1000
+      @movement.acceleration.x = -1
     if (moves.right)
-      @sprite.body.acceleration.x = 1000
+      @movement.acceleration.x = 1
     if (moves.up)
-      @sprite.body.acceleration.y = -1000
+      @movement.acceleration.y = -1
     if (moves.down)
-      @sprite.body.acceleration.y = 1000
+      @movement.acceleration.y = 1
+    @movement.acceleration.setMagnitude(ACCELERATION)
+    @sprite.body.acceleration = @movement.acceleration
+    if @sprite.body.velocity.getMagnitude() > MAX_SPEED
+      @movement.max_velocity.setMagnitude(MAX_SPEED)
+    @sprite.body.maxVelocity = @movement.max_velocity
 
     anim = "idle"
     if Math.abs(@sprite.body.velocity.x) > Math.abs(@sprite.body.velocity.y)
@@ -59,8 +74,5 @@ class Avatar extends Entity
         anim = "up"
     if @sprite.animations.currentAnim.name != anim
       @sprite.animations.play(anim)
-
-    @sprite.body.velocity.x *= 0.9
-    @sprite.body.velocity.y *= 0.9
 
 window.Avatar = Avatar
