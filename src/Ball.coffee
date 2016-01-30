@@ -1,6 +1,10 @@
 #= require Entity
 
 class Ball extends Entity
+  ACCELERATION = 500
+  MAX_SPEED = 200
+  DRAG = 200
+
   constructor: ->
     super
 
@@ -11,6 +15,7 @@ class Ball extends Entity
 
     if !@isRemote
       @host.game.physics.arcade.enable(@sprite)
+      @sprite.body.drag.set(DRAG, DRAG)
 
   kick:(vector)->
     @rolling = true
@@ -48,7 +53,8 @@ class Ball extends Entity
 
       moves = @host.pollController()
       if (moves.but1)
-        @kick({x: possessor.sprite.body.velocity.x*3, y: possessor.sprite.body.velocity.y*3})
+        vector = possessor.sprite.body.acceleration.clone().setMagnitude(500)
+        @kick(vector)
 
 
     @catchable = @getTimeSinceKick() > 0.5

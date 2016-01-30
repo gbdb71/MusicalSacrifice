@@ -22,13 +22,13 @@ class Avatar extends Entity
 
     if !@isRemote
       @host.game.physics.arcade.enable(@sprite)
+      @sprite.body.drag.set(DRAG, DRAG)
 
   setState:(state)->
     @sprite.position.x = state.x
     @sprite.position.y = state.y
     if @sprite.animations.currentAnim.name != state.anim
       @sprite.animations.play(state.anim)
-      @sprite.body.drag.set(DRAG, DRAG)
     if state.skin && @skin != state.skin
       @skin = state.skin
       @sprite.loadTexture(@skin)
