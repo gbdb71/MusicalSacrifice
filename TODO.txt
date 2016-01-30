@@ -1,4 +1,3 @@
-* add speech bubbles with typed messages
 * build a common game state for levels: prepare, play, celebrate
   + prepare phase shows instructions, players, countdown
   + play phase shows countdown, score

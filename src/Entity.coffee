@@ -5,6 +5,7 @@ class Entity
     @lastState = {}
     @type = null
     @forLevel = null
+    @caption = null
 
     @init()
 
@@ -51,5 +52,37 @@ class Entity
 
   onLoseOwnership: ->
 
+  setCaption:(message)->
+    style = {
+      font: "18px Arial",
+      fill: '#FFFF00',
+      align: "center"
+    }
+    shadow_style = {
+      font: "18px Arial",
+      fill: "#000000",
+      align: "center"
+    }
+    @removeCaption()
+    shadow = @game.add.text(0, 0, message, shadow_style)
+    @caption = @game.add.text(0, 0, message, style)
+    @caption.anchor.setTo(0.5, 1.0);
+    @caption.shadow = shadow
+    @caption.shadow.anchor.setTo(0.5, 1.0);
+    @caption.message = message
+    @game.time.events.add(5000, @removeCaption, this)
+
+  removeCaption:->
+    if !!@caption
+      @caption.shadow.destroy()
+      @caption.destroy()
+      @caption = null
+
+  updateCaption:(sprite, offset)->
+    if !!@caption
+      @caption.x = sprite.position.x
+      @caption.y = sprite.position.y + offset
+      @caption.shadow.x = @caption.x + 2
+      @caption.shadow.y = @caption.y + 2
 
 MS.Entity = Entity

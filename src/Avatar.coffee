@@ -18,6 +18,7 @@ class Avatar extends MS.Entity
       @sprite.body.bounce.set(0.7,0.7)
       @sprite.body.height = 16
       @sprite.body.width = 20
+      @setCaption("hello world")
 
   setSprite: ->
     @skin = @game.generator.pick(@game.sheets)
@@ -43,6 +44,7 @@ class Avatar extends MS.Entity
   setState:(state)->
     @sprite.position.x = state.x
     @sprite.position.y = state.y
+    @updateCaption(@sprite, 15-@sprite.height)
     if @sprite.animations.currentAnim? && @sprite.animations.currentAnim.name != state.anim
       @sprite.animations.play(state.anim)
     if state.skin && (@skin != state.skin[0] || @row != state.skin[1] || @col != state.skin[2])
@@ -51,18 +53,23 @@ class Avatar extends MS.Entity
       @col = state.skin[2]
       @sprite.loadTexture(@skin)
       @setAnimations()
+    if state.message && @caption?.message != state.message
+      @setCaption(state.message)
 
   getState:(state)->
     x: @sprite.position.x,
     y: @sprite.position.y,
     skin: [@skin, @row, @col],
     anim: @sprite.animations.currentAnim.name
+    message: @caption?.message
 
   remove:->
     @sprite.kill()
 
   controlledUpdate:->
     return unless @sprite.alive
+
+    @updateCaption(@sprite, 15-@sprite.height)
 
     moves = @game.controller.poll()
 
