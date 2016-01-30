@@ -110,7 +110,6 @@ class EntityManager
     else if data.message == "joinLevel"
       @sendInitForAllOwnedEntitiesToPeer(remote.peer, data.level)
 
-
   broadcastEntityState:(entity)->
     id = entity.id
     state = entity.getState()

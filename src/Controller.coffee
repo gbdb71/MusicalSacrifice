@@ -76,7 +76,7 @@ class Controller
       if key.keyCode == Phaser.KeyCode.ENTER
         @message = @buffer
         @buffer = ""
-    else if @buffer.length <= 16
+    else if @buffer.length < 16
       if key.shiftKey
         upper = text.toUpperCase() if !upper
         text = upper

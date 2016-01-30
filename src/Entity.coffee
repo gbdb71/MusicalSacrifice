@@ -73,7 +73,7 @@ class Entity
     @caption.shadow.anchor.setTo(0.5, 1.0);
     @caption.message = message
     @caption.spawned = false
-    @game.time.events.add(5000, @removeCaption, this)
+    @game.time.events.add(7000, @removeCaption, this)
 
   removeCaption:->
     if !!@caption
