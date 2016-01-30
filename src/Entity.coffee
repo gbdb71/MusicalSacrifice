@@ -6,6 +6,8 @@ class Entity
     @type = null
     @forLevel = null
     @caption = null
+    @spawned = false
+    @rate = null
 
     @init()
 
@@ -70,6 +72,7 @@ class Entity
     @caption.shadow = shadow
     @caption.shadow.anchor.setTo(0.5, 1.0);
     @caption.message = message
+    @caption.spawned = false
     @game.time.events.add(5000, @removeCaption, this)
 
   removeCaption:->
@@ -78,11 +81,18 @@ class Entity
       @caption.destroy()
       @caption = null
 
-  updateCaption:(sprite, offset)->
+  updateCaption:(x, y, offset)->
     if !!@caption
-      @caption.x = sprite.position.x
-      @caption.y = sprite.position.y + offset
-      @caption.shadow.x = @caption.x + 2
-      @caption.shadow.y = @caption.y + 2
+      if !@isRemote or !@caption.spawned
+        @caption.x = x
+        @caption.y = y+offset
+        @caption.shadow.x = x+2
+        @caption.shadow.y = y+offset+2
+        @caption.spawned = true
+      else
+        blend = @game.add.tween(@caption)
+        blend.to({ x: x, y: y+offset }, @rate, Phaser.Easing.Linear.None, true, 0, 0)
+        blend = @game.add.tween(@caption.shadow)
+        blend.to({ x: x+2, y: y+offset+2 }, @rate, Phaser.Easing.Linear.None, true, 0, 0)
 
 MS.Entity = Entity

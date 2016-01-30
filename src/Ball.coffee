@@ -40,8 +40,14 @@ class Ball extends MS.SingletonEntity
     @sprite.body.velocity.x**2 + @sprite.body.velocity.y**2
 
   setState:(state)->
-    @sprite.position.x = state.x
-    @sprite.position.y = state.y
+    if !@spawned
+      @sprite.position.x = state.x
+      @sprite.position.y = state.y
+      @spawned = true
+    else
+      blend = @game.add.tween(@sprite)
+      blend.to({ x: state.x, y: state.y }, @rate, Phaser.Easing.Linear.None, true, 0, 0)
+    @blend = @game.add.tween(@sprite)
     @possessorId = state.possessorId
     @catchable = state.catchable
 

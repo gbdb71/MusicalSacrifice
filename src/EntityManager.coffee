@@ -8,7 +8,7 @@ MS = window.MusicalSacrifice
 
 class EntityManager
   DELAY = 5000
-  FREQUENCY = 100
+  RATE = 100
   constructor: (@game)->
     @idCounter = 0
     @entities = {}
@@ -57,6 +57,7 @@ class EntityManager
     e = new entityClass(@game, id, isRemote, owner)
     e.forLevel = @level
     e.type = type
+    e.rate = RATE
     e.setState(state)
     @entities[id] = e
 
@@ -169,12 +170,12 @@ class EntityManager
   update:->
     now = @game.time.now
     if !@epoch
-      @epoch = now - FREQUENCY
+      @epoch = now - RATE
     elapsed = now - @epoch
     send = false
-    if elapsed > FREQUENCY
+    if elapsed > RATE
       send = true
-      @epoch += FREQUENCY
+      @epoch += RATE
     _.each @getMyEntities(), (entity)-> entity.update(send)
 
   getMyEntities:->

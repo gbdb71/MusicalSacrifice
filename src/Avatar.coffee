@@ -42,9 +42,14 @@ class Avatar extends MS.Entity
     @sprite.animations.play("idle")
 
   setState:(state)->
-    @sprite.position.x = state.x
-    @sprite.position.y = state.y
-    @updateCaption(@sprite, 15-@sprite.height)
+    @updateCaption(state.x, state.y, 15-@sprite.height)
+    if !@spawned
+      @sprite.position.x = state.x
+      @sprite.position.y = state.y
+      @spawned = true
+    else
+      blend = @game.add.tween(@sprite)
+      blend.to({ x: state.x, y: state.y }, @rate, Phaser.Easing.Linear.None, true, 0, 0)
     if @sprite.animations.currentAnim? && @sprite.animations.currentAnim.name != state.anim
       @sprite.animations.play(state.anim)
     if state.skin && (@skin != state.skin[0] || @row != state.skin[1] || @col != state.skin[2])
@@ -69,7 +74,7 @@ class Avatar extends MS.Entity
   controlledUpdate:->
     return unless @sprite.alive
 
-    @updateCaption(@sprite, 15-@sprite.height)
+    @updateCaption(@sprite.position.x, @sprite.position.y, 15-@sprite.height)
 
     moves = @game.controller.poll()
 
