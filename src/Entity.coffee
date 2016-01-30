@@ -1,10 +1,10 @@
 class Entity
-  constructor: (game, isRemote, id, broadcastStateFn)->
+  constructor: (host, id, isRemote, broadcastStateFn)->
     @isRemote = isRemote
     @id = id
     @lastState = {}
     @broadcastState = broadcastStateFn
-    @game = game
+    @host = host
     @type = @constructor.name
 
   update: ->
@@ -14,9 +14,9 @@ class Entity
     @updateRemotes()
 
   updateRemotes: ->
-    newState = getState()
+    newState = @getState()
     if !_.isEqual(lastState, newState)
-      broadcastState(newState)
+      @broadcastState(@id, newState)
       lastState = newState
 
   getState: ->

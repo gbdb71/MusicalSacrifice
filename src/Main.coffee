@@ -1,3 +1,5 @@
+#= require EntityManager
+
 MusicalSacrifice = window.MusicalSacrifice
 
 class Main extends Phaser.State
@@ -45,14 +47,11 @@ class Main extends Phaser.State
     @game.stage.backgroundColor = 0x886666;
 
   create: ->
-    @dudesById = {}
     @myId = '555'
+    @entityManager = null
 
-    @dudes = @game.add.group()
-    @avatar = @generator.pick(['nigel','bruce', 'julie', 'rachel'])
-    @player = @addDude(@myId, 400, 225, @avatar)
-    @game.physics.arcade.enable(@player)
-
+    @spriteGroup = @game.add.group()
+    # @avatar = @generator.pick(['nigel','bruce', 'julie', 'rachel'])
     @allPeers = [ ]
     @myPeerId = null
     #@peer = new Peer({ host: 'router.kranzky.com', port: 80, config: { 'iceServers': [] }, debug: 0 })
@@ -60,6 +59,9 @@ class Main extends Phaser.State
     @peer.on 'open', (id)=>
       console.info('Starting as peer ' + id)
       @myPeerId = id
+      @entityManager = new EntityManager(this, @myPeerId)
+      @entityManager.spawnOwnedEntity('Avatar', {x:400, y:225})
+
       @peer.listAllPeers (data)=>
         data = _.without(data, @myPeerId)
         @allPeers = _.map data, (peerId) =>
@@ -67,9 +69,10 @@ class Main extends Phaser.State
           channel.on 'open', =>
             console.info('Joining peer ' + peerId)
             channel.send({ message: "arrive" })
-            channel.send({ message: "initEntity", x: @player.body.x, y: @player.body.y, @avatar })
+            @entityManager.sendInitForAllOwnedEntitiesToChannel(channel)
           channel
         console.log('all peers: ' + _.map @allPeers, (channel)->channel.peer )
+
     @peer.on 'connection', (remote)=>
       remote.on 'data', (data)=>
         if data.message == "arrive"
@@ -77,71 +80,27 @@ class Main extends Phaser.State
           channel = @peer.connect remote.peer
           channel.on 'open', =>
             console.info('Initializing ourselves on peer ' + remote.peer)
-            channel.send({ message: "initEntity", x: @player.body.x, y: @player.body.y, @avatar })
+            @entityManager.sendInitForAllOwnedEntitiesToChannel(channel)
             @allPeers.push(channel)
         else if data.message == "initEntity"
           console.info('Peer has initialized themselves ' + remote.peer)
           # someone has just told us about them, so create their dude
-          @addDude(remote.peer, data.x, data.y, data.avatar)
+          @entityManager.processIncoming(data)
         else if data.message == "update"
-          @updateDude(remote.peer, data.x, data.y, data.anim)
+          @entityManager.processIncoming(data)
       remote.on 'close', =>
         @allPeers = _.reject @allPeers, (channel)-> channel.peer == remote.peer
-        @removeDude(remote.peer)
+        console.log("TODO remove entity")
 
-  addDude:(dudeId, x, y, sprite)->
-    dude = @dudes.create(x, y, sprite)
-    dude.animations.add("down", [0, 1, 2, 1], 20, true)
-    dude.animations.add("left", [4, 5, 6, 5], 10, true)
-    dude.animations.add("right", [8, 9, 10, 9], 10, true)
-    dude.animations.add("up", [12, 13, 14, 13], 20, true)
-    dude.animations.add("idle", [1], 20, true)
-    @dudesById[dudeId] = dude
-    dude
-
-  removeDude:(dudeId)->
-    dude = @dudesById[dudeId]
-    return if _.isUndefined(dude)
-    dude.kill()
-    delete @dudesById[dudeId]
-
-  updateDude:(dudeId, x, y, anim)->
-    dude = @dudesById[dudeId]
-    return if _.isUndefined(dude)
-    dude.position.x = x
-    dude.position.y = y
-    if dude.animations.currentAnim.name != anim
-      dude.animations.play(anim)
+  # removeDude:(dudeId)->
+  #   dude = @dudesById[dudeId]
+  #   return if _.isUndefined(dude)
+  #   dude.kill()
+  #   delete @dudesById[dudeId]
 
   update:->
-    moves = @pollController()
-    if (moves.left)
-      @player.body.velocity.x = -150
-    if (moves.right)
-      @player.body.velocity.x = 150
-    if (moves.up)
-      @player.body.velocity.y = -150
-    if (moves.down)
-      @player.body.velocity.y = 150
-
-    anim = "idle"
-    if Math.abs(@player.body.velocity.x) > Math.abs(@player.body.velocity.y)
-      if @player.body.velocity.x > 25
-        anim = "right"
-      else if @player.body.velocity.x < -25
-        anim = "left"
-    else
-      if @player.body.velocity.y > 25
-        anim = "down"
-      else if @player.body.velocity.y < -25
-        anim = "up"
-    if @player.animations.currentAnim.name != anim
-      @player.animations.play(anim)
-
-    @player.body.velocity.x *= 0.9
-    @player.body.velocity.y *= 0.9
-
-    @sendUpdate(@myId, @player.body.x, @player.body.y, anim)
+    if @entityManager?
+      @entityManager.update()
 
   pollController:=>
     moves =
@@ -199,9 +158,9 @@ class Main extends Phaser.State
 
     moves
 
-  sendUpdate:(id, x, y, anim) ->
+  broadcastToAllChannels:(data)->
     _.each @allPeers, (connection)->
-      connection.send({message: "update", x: x, y: y, anim: anim})
+      connection.send(data)
 
   destroy:->
 
