@@ -14,9 +14,9 @@ class Network
     @peer = new Peer({ host: 'router.kranzky.com', port: 80, config: { 'iceServers': [] }, debug: 0 })
     # @peer = new Peer({ host: 'localhost', port: 9000, config: { 'iceServers': [] }, debug: 0 })
 
-    window.makePeerHeartbeater(@peer)
 
     @peer.on 'open', (id)=>
+      window.makePeerHeartbeater(@peer)
       console.info('Starting as peer ' + id)
       @myPeerId = id
       @processCallbacks('ready', null, {})
