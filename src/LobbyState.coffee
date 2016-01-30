@@ -2,6 +2,8 @@ MS = window.MusicalSacrifice
 
 class LobbyState extends Phaser.State
   create: ->
-    @game.state.start("Soccer")
+
+  update:->
+    @game.entityManager.update()
 
 MS.LobbyState = LobbyState

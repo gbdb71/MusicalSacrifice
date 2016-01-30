@@ -1,3 +1,5 @@
+MS = window.MusicalSacrifice
+
 class Entity
   constructor: (@game, @id, @isRemote, @owner)->
     @lastState = {}
@@ -22,7 +24,7 @@ class Entity
       lastState = newState
 
   setOwned:(owned)->
-    # ifhese are equal then ownership has changed
+    # if these are equal then ownership has changed
     if owned == @isRemote
       @isRemote = !owned
       if owned
@@ -32,10 +34,10 @@ class Entity
         console.log("We lost ownership of #{@type} #{@id}")
         @onLoseOwnership()
 
-  _getState: ->
-    _.extend(@getState(), {owner: @owner})
+  getState: ->
+    # override to return state to sync
 
-  _setState:(state) ->
+  setState:(state) ->
     # override to apply received state to entity
 
   controlledUpdate: ->
@@ -50,4 +52,4 @@ class Entity
   onLoseOwnership: ->
 
 
-window.Entity = Entity
+MS.Entity = Entity

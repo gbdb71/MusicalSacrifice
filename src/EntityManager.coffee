@@ -2,10 +2,12 @@
 #= require SingletonEntity
 #= require Avatar
 #= require Ball
+#= require GameMaster
 
 MS = window.MusicalSacrifice
 
 class EntityManager
+  DELAY = 5000
   constructor: (@game)->
     # TBD: hook up game.network.on...
     # @sendInitForAllOwnedEntitiesToChannel
@@ -23,18 +25,22 @@ class EntityManager
     @game.network.on 'data', (channel, data)=>
       @processIncoming(data, channel)
 
+    window.setTimeout =>
+      @spawnOwnedEntity("GameMaster")
+    , DELAY
+
   setGroup: (@group)->
 
   getNewId:->
     @idCounter += 1
-    @game.network.myPeerId + @idCounter
+    Date.now() + '' + @idCounter
 
   spawnRemoteEntity: (type, id, owner, state)->
     console.log("Spawning remote #{type} #{id} #{state} for @{owner}")
     @addEntity(type, id, true, owner, state)
 
-  spawnOwnedEntity: (type, state)->
-    if window[type].prototype instanceof SingletonEntity
+  spawnOwnedEntity: (type, state={})->
+    if MS[type].prototype instanceof MS.SingletonEntity
       if @getEntitiesOfType(type).length > 0
         console.log("Skipping spawning singleton type #{type} because prior exist")
         return
@@ -45,8 +51,8 @@ class EntityManager
     @broadcastInitEntity(entity)
     entity
 
-  addEntity: (type, id, isRemote, owner, state)=>
-    entityClass = window[type] # get class from string
+  addEntity: (type, id, isRemote, owner, state={})=>
+    entityClass = MS[type] # get class from string
     e = new entityClass(@game, id, isRemote, owner)
     e.setState(state)
     @entities[id] = e
@@ -77,7 +83,7 @@ class EntityManager
 
   broadcastEntityState:(entity)->
     id = entity.id
-    state = entity._getState()
+    state = entity.getState()
     @game.network.broadcastToAllChannels
       message: "update",
       id: id,
@@ -120,7 +126,7 @@ class EntityManager
     "message": "initEntity",
     "type": entity.type
     "id": entity.id,
-    "state": entity._getState(),
+    "state": entity.getState(),
 
   update:->
     _.each @getMyEntities(), (entity)-> entity.update()
@@ -129,7 +135,7 @@ class EntityManager
     _.filter(@entities, (entity)-> entity.isRemote == false)
 
   getEntitiesForPeerId:(peerId)->
-    _.filter(@entities, (entity)-> entity.id.startsWith(peerId))
+    _.filter(@entities, (entity)-> entity.owner == peerId)
 
   getEntitiesOfType:(type)->
     _.filter(@entities, (entity)-> entity.type == type)

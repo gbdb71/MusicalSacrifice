@@ -1,6 +1,7 @@
 #= require Entity
+MS = window.MusicalSacrifice
 
-class SingletonEntity extends Entity
+class SingletonEntity extends MS.Entity
 
   controlledUpdate:()->
     elderDupes = _.filter(
@@ -14,4 +15,4 @@ class SingletonEntity extends Entity
       console.log("#{@type} destroying itself as it's not the best singleton")
       @game.entityManager.despawnEntity(@)
 
-window.SingletonEntity = SingletonEntity
+MS.SingletonEntity = SingletonEntity

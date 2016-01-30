@@ -1,6 +1,7 @@
 #= require SingletonEntity
+MS = window.MusicalSacrifice
 
-class Ball extends SingletonEntity
+class Ball extends MS.SingletonEntity
   ACCELERATION = 500
   MAX_SPEED = 200
   DRAG = 200
@@ -52,7 +53,6 @@ class Ball extends SingletonEntity
     @sprite.kill()
 
   controlledUpdate:->
-    super
     if @possessorId?
       possessor = @game.entityManager.entities[@possessorId]
       if possessor?
@@ -74,8 +74,8 @@ class Ball extends SingletonEntity
           @catchable = false
           return
         )
-
     @catchable = @getTimeSinceKick() > CATCH_COOLDOWN
+    super
 
 
-window.Ball = Ball
+MS.Ball = Ball

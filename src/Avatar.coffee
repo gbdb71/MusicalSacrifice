@@ -1,6 +1,7 @@
 #= require Entity
+MS = window.MusicalSacrifice
 
-class Avatar extends Entity
+class Avatar extends MS.Entity
   ACCELERATION = 600
   MAX_SPEED = 200
   DRAG = 200
@@ -75,4 +76,4 @@ class Avatar extends Entity
     if @sprite.animations.currentAnim.name != anim
       @sprite.animations.play(anim)
 
-window.Avatar = Avatar
+MS.Avatar = Avatar
