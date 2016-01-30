@@ -12,6 +12,7 @@ class EntityManager
     @idCounter = 0
     @entities = {}
     @level = null
+    @newLevel = null
 
     @game.network.on 'open', (channel, data)=>
       @sendInitForAllOwnedEntitiesToPeer(channel.peer, null)
@@ -71,9 +72,13 @@ class EntityManager
       if entity.forLevel && entity.forLevel != @level && !entity.isRemote
         @despawnEntity(entity)
 
-  startLevel:(level)->
-    if @level != level
-      @level = level
+  setLevel:(level)->
+    @newLevel = level
+
+  startLevel:->
+    if @level != @newLevel
+      @level = @newLevel
+      @newLevel = null
       @game.network.broadcastToAllChannels(
         message: "joinLevel",
         level: @level
@@ -81,7 +86,6 @@ class EntityManager
       @cleanUpOldLevel()
 
   processIncoming:(data, remote)->
-    console.log(data)
     if data.message == "initEntity"
       if (!data.forLevel && !@level) || data.forLevel == @level
         @spawnRemoteEntity(data.type, data.id, remote.peer, data.state)
