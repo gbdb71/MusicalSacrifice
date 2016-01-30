@@ -85,3 +85,4 @@ class Ball extends MS.SingletonEntity
 
 
 MS.Ball = Ball
+MS.entities["Ball"] = Ball

@@ -38,7 +38,7 @@ class EntityManager
     @addEntity(type, id, true, owner, state)
 
   spawnOwnedEntity: (type, state={})->
-    if MS[type].prototype instanceof MS.SingletonEntity
+    if MS.entities[type].prototype instanceof MS.SingletonEntity
       if _.filter(@getEntitiesOfType(type), (entity)-> !entity.forLevel? || entity.forLevel == @level).length > 0
         console.log("Skipping spawning singleton type #{type} because prior exist")
         return
@@ -50,7 +50,7 @@ class EntityManager
     entity
 
   addEntity: (type, id, isRemote, owner, state={})=>
-    entityClass = MS[type] # get class from string
+    entityClass = MS.entities[type] # get class from string
     e = new entityClass(@game, id, isRemote, owner)
     e.forLevel = @level
     e.setState(state)

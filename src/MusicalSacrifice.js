@@ -1,4 +1,4 @@
 #= require_self
 #= require Main
 
-window.MusicalSacrifice = {}
+window.MusicalSacrifice = {"entities":{}}

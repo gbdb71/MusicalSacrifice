@@ -100,3 +100,4 @@ class Avatar extends MS.Entity
       @sprite.animations.play(anim)
 
 MS.Avatar = Avatar
+MS.entities["Avatar"] = Avatar

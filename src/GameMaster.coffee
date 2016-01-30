@@ -50,3 +50,4 @@ class GameMaster extends MS.SingletonEntity
 
 
 MS.GameMaster = GameMaster
+MS.entities["GameMaster"] = GameMaster
