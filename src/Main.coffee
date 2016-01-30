@@ -149,9 +149,9 @@ class Main extends Phaser.State
     if @kb.isDown(Phaser.Keyboard.S)
       moves.but2 = true
     if @kb.isDown(Phaser.Keyboard.A)
-      moves.but1 = true
+      moves.but3 = true
     if @kb.isDown(Phaser.Keyboard.D)
-      moves.but1 = true
+      moves.but4 = true
 
     moves
 
