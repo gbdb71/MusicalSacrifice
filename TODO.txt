@@ -4,7 +4,7 @@
   + celebrate phase focuses on winner
   + sync state and so on
   + level controls spawn points and such
-* prevent new players from spawning during a level; process spawns when level inits
-* flesh out the lobby, add player name and team name perhaps (if needed for peer restriction)
-  + figure out how to restrict peer connection to the same LAN
 * design six different thematic levels
+* improve networking
+  + prevent new players from spawning during a level; process spawns when level inits
+  + change owner of game state when current owner disconnects

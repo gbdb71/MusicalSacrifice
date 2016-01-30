@@ -20,8 +20,11 @@ class BootState extends Phaser.State
     @game.generator = new Phaser.RandomDataGenerator([(new Date()).getTime()])
 
   create:->
+    name = window.location.hash.slice(1)
+    name = "GGJ" if name.length == 0
+    user = @game.generator.integerInRange(1000,9999)
     @game.controller = new MS.Controller(@game)
-    @game.network = new MS.Network
+    @game.network = new MS.Network(name, user)
     @game.network.on "ready", =>
       @game.entityManager = new MS.EntityManager(@game)
       @game.state.start("Load")

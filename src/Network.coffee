@@ -3,25 +3,27 @@
 MS = window.MusicalSacrifice
 
 class Network
-  constructor:->
+  HOST = 'router.kranzky.com'
+  PORT = 80
+
+  constructor:(world, user)->
     @callbacks =
       'ready': []
       'open': []
       'data': []
       'close': []
     @allPeers = [ ]
-    @myPeerId = null
-    @peer = new Peer({ host: 'router.kranzky.com', port: 80, config: { 'iceServers': [] }, debug: 0 })
-    # @peer = new Peer({ host: 'localhost', port: 9000, config: { 'iceServers': [] }, debug: 0 })
-
+    @myPeerId = world + '_' + user
+    @peer = new Peer(@myPeerId, { host: HOST, port: PORT })
 
     @peer.on 'open', (id)=>
       window.makePeerHeartbeater(@peer)
       console.info('Starting as peer ' + id)
-      @myPeerId = id
       @processCallbacks('ready', null, {})
       @peer.listAllPeers (data)=>
         data = _.without(data, @myPeerId)
+        data = _.filter data, (peerId)=>
+          world == peerId.slice(0, -5)
         @allPeers = _.map data, (peerId) =>
           channel = @peer.connect(peerId)
           channel.on 'open', =>
@@ -31,6 +33,7 @@ class Network
           channel
 
     @peer.on 'connection', (remote)=>
+      return if world != remote.peer.slice(0, -5)
       remote.on 'data', (data)=>
         if data.message == "arrive"
           channel = @peer.connect remote.peer
