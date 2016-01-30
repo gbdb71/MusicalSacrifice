@@ -128,6 +128,7 @@ class EntityManager
       newOwner: newOwner
 
   grantOwnership:(entity, newOwner)->
+    return if entity.owner == newOwner
     console.info("Granting ownership of #{entity.type} to #{newOwner}")
     @broadcastGrantOwnership(entity, newOwner)
     @onGrantOwnership(entity, newOwner)
