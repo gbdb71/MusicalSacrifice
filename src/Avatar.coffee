@@ -18,7 +18,6 @@ class Avatar extends MS.Entity
       @sprite.body.bounce.set(0.7,0.7)
       @sprite.body.height = 16
       @sprite.body.width = 20
-      @setCaption("hello world")
 
   setSprite: ->
     @skin = @game.generator.pick(@game.sheets)
@@ -42,7 +41,6 @@ class Avatar extends MS.Entity
     @sprite.animations.play("idle")
 
   setState:(state)->
-    @updateCaption(state.x, state.y, 15-@sprite.height)
     if !@spawned
       @sprite.position.x = state.x
       @sprite.position.y = state.y
@@ -60,6 +58,7 @@ class Avatar extends MS.Entity
       @setAnimations()
     if state.message && @caption?.message != state.message
       @setCaption(state.message)
+    @updateCaption(state.x, state.y, 15-@sprite.height)
 
   getState:(state)->
     x: @sprite.position.x,
@@ -75,6 +74,10 @@ class Avatar extends MS.Entity
     return unless @sprite.alive
 
     @updateCaption(@sprite.position.x, @sprite.position.y, 15-@sprite.height)
+
+    if @game.controller.message.length > 0
+      @setCaption(@game.controller.message)
+      @game.controller.message = ""
 
     moves = @game.controller.poll()
 

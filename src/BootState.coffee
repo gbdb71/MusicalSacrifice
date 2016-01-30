@@ -17,9 +17,9 @@ class BootState extends Phaser.State
     @game.state.add("Load", MS.LoadState)
     @game.state.add("Lobby", MS.LobbyState)
     @game.state.add("Soccer", MS.SoccerState)
+    @game.generator = new Phaser.RandomDataGenerator([(new Date()).getTime()])
 
   create:->
-    @game.generator = new Phaser.RandomDataGenerator([(new Date()).getTime()])
     @game.controller = new MS.Controller(@game)
     @game.network = new MS.Network
     @game.network.on "ready", =>
