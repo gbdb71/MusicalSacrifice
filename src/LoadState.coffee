@@ -1,6 +1,9 @@
 MS = window.MusicalSacrifice
 
 class LoadState extends Phaser.State
+  SHEETS = ['animals1', 'bonus1', 'chara2', 'chara3', 'chara4', 'chara5',
+            'military1', 'military2', 'military3', 'npc1', 'npc2', 'npc3', 'npc4']
+
   init:->
     message = "=== MUSICAL SACRIFICE ===\nis\nLOADING"
     style =
@@ -13,12 +16,11 @@ class LoadState extends Phaser.State
     @graphics.lineStyle(1, 0x5588cc, 1)
     @graphics.drawRect(100, 339, 600, 22)
     @prograss = 0
+    @game.sheets = SHEETS
 
   preload:->
-    @game.load.spritesheet('nigel', 'assets/nigel.png', 32, 32)
-    @game.load.spritesheet('bruce', 'assets/bruce.png', 32, 32)
-    @game.load.spritesheet('julie', 'assets/julie.png', 32, 32)
-    @game.load.spritesheet('rachel', 'assets/rachel.png', 32, 32)
+    _.each SHEETS, (name)=>
+      @game.load.spritesheet(name, 'assets/' + name + '.png', 26, 36)
     @game.load.image('ball', 'assets/ball.png')
 
   loadUpdate:->

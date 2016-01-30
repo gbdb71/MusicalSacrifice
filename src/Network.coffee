@@ -14,6 +14,7 @@ class Network
 
     @peer.on 'open', (id)=>
       console.info('Starting as peer ' + id)
+      console.log(@peer)
       @myPeerId = id
       @processCallbacks('ready', null, {})
       @peer.listAllPeers (data)=>
@@ -22,6 +23,7 @@ class Network
           channel = @peer.connect(peerId)
           channel.on 'open', =>
             console.info('Joining peer ' + peerId)
+            console.log(channel)
             channel.send({ message: "arrive" })
             @processCallbacks('open', channel, {})
           channel
@@ -30,6 +32,7 @@ class Network
       remote.on 'data', (data)=>
         if data.message == "arrive"
           channel = @peer.connect remote.peer
+          console.log remote
           channel.on 'open', =>
             console.info('Initializing ourselves on peer ' + remote.peer)
             @allPeers.push(channel)

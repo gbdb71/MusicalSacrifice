@@ -10,19 +10,30 @@ class Avatar extends Entity
       acceleration: new Phaser.Point
       max_velocity: new Phaser.Point
 
-    @skin = @game.generator.pick(['nigel','bruce', 'julie', 'rachel'])
-    @sprite = @game.entityManager.group.create(-100,-100, @skin)
-    @sprite.animations.add("down", [0, 1, 2, 1], 10, true)
-    @sprite.animations.add("left", [4, 5, 6, 5], 10, true)
-    @sprite.animations.add("right", [8, 9, 10, 9], 10, true)
-    @sprite.animations.add("up", [12, 13, 14, 13], 10, true)
-    @sprite.animations.add("idle", [1], 20, true)
+    @setSprite()
 
     if !@isRemote
       @game.physics.arcade.enable(@sprite)
       @sprite.body.drag.set(DRAG, DRAG)
       @sprite.body.collideWorldBounds = true
       @sprite.body.bounce.set(0.7,0.7)
+
+  setSprite: ->
+    @skin = @game.generator.pick(@game.sheets)
+    row = @game.generator.pick([0, 1])
+    col = @game.generator.pick([0, 1, 2, 3])
+    @sprite = @game.entityManager.group.create(-100,-100, @skin)
+    top = row*48 + col*3
+    @sprite.animations.add("idle", [top + 1], 10, true)
+    @sprite.animations.add("down", [top, top+1, top+2], 10, true)
+    top += 12
+    @sprite.animations.add("left", [top, top+1, top+2], 10, true)
+    top += 12
+    @sprite.animations.add("right", [top, top+1, top+2], 10, true)
+    top += 12
+    @sprite.animations.add("up", [top, top+1, top+2], 10, true)
+    @sprite.animations.play("idle")
+    @sprite.scale.set(2, 2)
 
   setState:(state)->
     @sprite.position.x = state.x
