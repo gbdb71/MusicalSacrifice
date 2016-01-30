@@ -58,22 +58,22 @@ class Ball extends SingletonEntity
     if @possessorId?
       possessor = @game.entityManager.entities[@possessorId]
       if possessor?
-        offset = possessor.direction
-        @sprite.position.x = possessor.sprite.position.x + offset.x * 10
-        @sprite.position.y = possessor.sprite.position.y + offset.y
-        if offset.y < 0
-          @sprite.position.y -= 20
+        offset = possessor.direction.clone()
+        offset.setMagnitude(15)
+        @sprite.position.x = possessor.sprite.position.x + offset.x
+        @sprite.position.y = possessor.sprite.position.y + offset.y - 10
 
         moves = @game.controller.poll()
         if (moves.but1)
-          vector = possessor.sprite.body.acceleration.clone().setMagnitude(KICK_MAGNITUDE)
+          vector = possessor.direction.clone().setMagnitude(KICK_MAGNITUDE)
           @kick(vector)
 
     else if @catchable
       # get all avatars and see if any are overlapping
       avatars = @game.entityManager.getEntitiesOfType("Avatar")
       _.each(avatars, (avatar)=>
-        if Phaser.Rectangle.intersects(avatar.sprite.getBounds(), @sprite.getBounds())
+        hitbox = new Phaser.Rectangle(avatar.sprite.position.x, avatar.sprite.position.y - 25, 30, 30)
+        if Phaser.Rectangle.intersects(hitbox, @sprite.getBounds())
           @possessorId = avatar.id
           @game.entityManager.grantOwnership(this, avatar.owner)
           @catchable = false
