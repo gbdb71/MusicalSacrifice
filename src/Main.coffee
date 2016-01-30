@@ -47,7 +47,7 @@ class Main extends Phaser.State
     console.log(@dudes)
     @cursors = @game.input.keyboard.createCursorKeys()
 
-    @peer = new Peer({ debug: 3, host: 'router.kranzky.com', port: 80, config: { 'iceServers': [] } })
+    @peer = new Peer({ host: 'router.kranzky.com', port: 80, config: { 'iceServers': [] }, debug: 0 })
 
     @allPeers = []
     @myPeerId = null
@@ -60,7 +60,7 @@ class Main extends Phaser.State
           channel = @peer.connect(peerId)
           channel.on 'open', =>
             channel.send({message:"arrive"})
-            @addDude(channel.peer, data.x, data.y)
+            @addDude(channel.peer, data.x, data.y, 'nigel')
           channel
 
         console.log('all peers: ' + _.map @allPeers, (channel)->channel.peer )
@@ -69,19 +69,19 @@ class Main extends Phaser.State
     @peer.on 'connection', (remote)=>
       remote.on 'data', (data)=>
         if data.message == "update"
-          @updateDude(remote.peer, data.x, data.y)
+          @updateDude(remote.peer, data.x, data.y, data.anim)
         else if data.message == "arrive"
           console.info(data)
           channel = @peer.connect remote.peer
           @allPeers.push(channel)
           console.log('all peers: ' + _.map @allPeers, (channel)->channel.peer)
-          @addDude(remote.peer, data.x, data.y)
+          @addDude(remote.peer, data.x, data.y, 'nigel')
       remote.on 'close', =>
         @allPeers = _.reject @allPeers, (channel)-> channel.peer == remote.peer
         @removeDude(remote.peer)
 
-  addDude:(dudeId, x, y)->
-    dude = @dudes.create(x, y, 'nigel')
+  addDude:(dudeId, x, y, sprite)->
+    dude = @dudes.create(x, y, sprite)
     dude.animations.frame = 1
     dude.animations.add("down", [0, 1, 2, 1], 20, true)
     dude.animations.add("left", [4, 5, 6, 5], 10, true)
@@ -96,10 +96,11 @@ class Main extends Phaser.State
     dude.kill()
     delete @dudesById[dudeId]
 
-  updateDude:(dudeId, x, y)->
+  updateDude:(dudeId, x, y, anim)->
     dude = @dudesById[dudeId]
     dude.position.x = x
     dude.position.y = y
+    dude.animations.play(anim)
 
   update:->
     moves = @pollController()
@@ -112,23 +113,23 @@ class Main extends Phaser.State
     if (moves.down)
       @player.body.velocity.y = 150
 
-    animation = "idle"
+    anim = "idle"
     if Math.abs(@player.body.velocity.x) > Math.abs(@player.body.velocity.y)
       if @player.body.velocity.x > 25
-        animation = "right"
+        anim = "right"
       else if @player.body.velocity.x < -25
-        animation = "left"
+        anim = "left"
     else
       if @player.body.velocity.y > 25
-        animation = "down"
+        anim = "down"
       else if @player.body.velocity.y < -25
-        animation = "up"
-    @player.animations.play(animation)
+        anim = "up"
+    @player.animations.play(anim)
 
     @player.body.velocity.x *= 0.95
     @player.body.velocity.y *= 0.95
 
-    @sendUpdate(@myId, @player.body.x, @player.body.y)
+    @sendUpdate(@myId, @player.body.x, @player.body.y, anim)
 
   pollController:=>
     moves =
@@ -186,9 +187,9 @@ class Main extends Phaser.State
 
     moves
 
-  sendUpdate:(id, x, y) ->
+  sendUpdate:(id, x, y, anim) ->
     _.each @allPeers, (connection)->
-      connection.send({message: "update", x: x, y: y})
+      connection.send({message: "update", x: x, y: y, anim: anim})
 
   destroy:->
 
