@@ -3,8 +3,7 @@ MS = window.MusicalSacrifice
 class Entity
   constructor: (@game, @id, @isRemote, @owner)->
     @lastState = {}
-
-    @type = @constructor.name
+    @type = null
     @forLevel = null
 
     @init()

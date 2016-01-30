@@ -53,6 +53,7 @@ class EntityManager
     entityClass = MS.entities[type] # get class from string
     e = new entityClass(@game, id, isRemote, owner)
     e.forLevel = @level
+    e.type = type
     e.setState(state)
     @entities[id] = e
 
