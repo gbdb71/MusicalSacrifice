@@ -22,6 +22,7 @@ class Ball extends SingletonEntity
       @sprite.body.drag.set(DRAG, DRAG)
       @sprite.body.collideWorldBounds = true
       @sprite.body.bounce.set(0.9,0.9)
+    @sprite.body.moves = true
 
   kick:(vector)->
     @rolling = true
