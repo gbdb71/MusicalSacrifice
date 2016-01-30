@@ -3,8 +3,8 @@
 class Avatar extends Entity
   constructor: ->
     super
-
-    @sprite = @host.spriteGroup.create(-100,-100, 'nigel')
+    @skin = @host.generator.pick(['nigel','bruce', 'julie', 'rachel'])
+    @sprite = @host.spriteGroup.create(-100,-100, @skin)
     @sprite.animations.add("down", [0, 1, 2, 1], 10, true)
     @sprite.animations.add("left", [4, 5, 6, 5], 10, true)
     @sprite.animations.add("right", [8, 9, 10, 9], 10, true)
@@ -19,10 +19,14 @@ class Avatar extends Entity
     @sprite.position.y = state.y
     if @sprite.animations.currentAnim.name != state.anim
       @sprite.animations.play(state.anim)
+    if state.skin && @skin != state.skin
+      @skin = state.skin
+      @sprite.loadTexture(@skin)
 
   getState:(state)->
     x: @sprite.position.x,
-    y: @sprite.position.y
+    y: @sprite.position.y,
+    skin: @skin,
     anim: @sprite.animations.currentAnim.name
 
   despawn:->
