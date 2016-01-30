@@ -3,7 +3,7 @@ window.makePeerHeartbeater = function(peer) {
     function heartbeat () {
         timeoutId = setTimeout( heartbeat, 20000 );
         if ( peer.socket._wsOpen() ) {
-            console.log("sending heartbeart")
+            console.debug("💕")
             peer.socket.send( {type:'HEARTBEAT'} );
         }
     }

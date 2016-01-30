@@ -35,17 +35,17 @@ class EntityManager
 
   spawnRemoteEntity: (type, id, owner, state)->
     return if @entities[id] # I told him we already got one!
-    console.log("Spawning remote #{type} #{id} #{state} for #{owner}")
+    console.info("Spawning remote #{type} #{id} #{state} for #{owner}")
     @addEntity(type, id, true, owner, state)
 
   spawnOwnedEntity: (type, state={})->
     if MS.entities[type].prototype instanceof MS.SingletonEntity
       if _.filter(@getEntitiesOfType(type), (entity)-> !entity.forLevel? || entity.forLevel == @level).length > 0
-        console.log("Skipping spawning singleton type #{type} because prior exist")
+        console.info("Skipping spawning singleton type #{type} because prior exist")
         return
 
     id = @getNewId()
-    console.log("Spawning owned #{type} #{id} #{state}")
+    console.info("Spawning owned #{type} #{id}: ", state)
     entity = @addEntity(type, id, false, @game.network.myPeerId, state)
     @broadcastInitEntity(entity)
     entity
@@ -65,12 +65,12 @@ class EntityManager
 
   removeEntity:(entity)->
     return if !entity
-    console.log("removing entity: #{entity.type} #{entity.name}")
+    console.info("Removing entity: #{entity.type} #{entity.name}")
     @entities[entity.id].remove()
     delete @entities[entity.id]
 
   cleanUpOldLevel:()->
-    console.log("Leaving Level")
+    console.info("Leaving Level")
     _.each @entities, (entity)=>
       if entity.forLevel && entity.forLevel != @level && !entity.isRemote
         @despawnEntity(entity)
@@ -89,7 +89,7 @@ class EntityManager
       @cleanUpOldLevel()
 
   processIncoming:(data, remote)->
-    console.debug(data) unless data.message == "update"
+    console.debug("Received: ", data) unless data.message == "update"
     if data.message == "initEntity"
       if !data.forLevel || data.forLevel == @level
         @spawnRemoteEntity(data.type, data.id, remote.peer, data.state)
@@ -101,7 +101,7 @@ class EntityManager
       entity = @entities[data.id]
       @removeEntity(entity)
     else if data.message == "grantOwnership"
-      console.log("Received grant ownership message #{data}")
+      console.info("Received grant ownership message #{data}")
       entity = @entities[data.id]
       @onGrantOwnership(entity, data.newOwner)
     else if data.message == "joinLevel"
@@ -128,19 +128,19 @@ class EntityManager
       newOwner: newOwner
 
   grantOwnership:(entity, newOwner)->
-    console.log("Granting ownership of #{entity.type} to #{newOwner}")
+    console.info("Granting ownership of #{entity.type} to #{newOwner}")
     @broadcastGrantOwnership(entity, newOwner)
     @onGrantOwnership(entity, newOwner)
 
   onGrantOwnership:(entity, newOwner)->
-    console.log("been told to grant ownership of #{entity.type} #{entity.id} to #{newOwner}")
+    console.info("Been told to grant ownership of #{entity.type} #{entity.id} to #{newOwner}")
     entity.setOwned(newOwner == @game.network.myPeerId)
     entity.owner = newOwner
 
   despawnEntity:(entity)->
     return if !entity
 
-    console.log("despawning entity: #{entity.type} #{entity.name}")
+    console.info("Despawning entity: #{entity.type} #{entity.name}")
     @broadcastDespawnEntity(entity)
     @removeEntity(entity)
 
@@ -152,7 +152,7 @@ class EntityManager
     _.each(@getMyEntities(), (entity)=>
       if (!entity.forLevel && !level) || entity.forLevel == level
         message = @getInitEntityMessage(entity)
-        console.log("sending", message)
+        console.debug("Sending: ", message)
         channel.send message
     )
 

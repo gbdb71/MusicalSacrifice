@@ -65,7 +65,7 @@ class Ball extends MS.SingletonEntity
         @sprite.position.y = possessor.sprite.position.y + offset.y - 10
 
         moves = @game.controller.poll()
-        if (moves.but1)
+        if (moves.button)
           vector = possessor.direction.clone().setMagnitude(KICK_MAGNITUDE)
           @kick(vector)
 

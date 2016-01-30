@@ -35,7 +35,7 @@ class GameMaster extends MS.SingletonEntity
 
   followToLevel:->
     if @level
-      console.log("Following to level: #{@levelId}")
+      console.info("Following to level: #{@levelId}")
       @game.entityManager.setLevel(@levelId)
       @game.state.start(@level)
 
@@ -43,7 +43,7 @@ class GameMaster extends MS.SingletonEntity
     if level
       @level = level
       @levelId = @level + Date.now()
-      console.log("Moving to level: #{@levelId}")
+      console.info("Moving to level: #{@levelId}")
       @game.entityManager.setLevel(@levelId)
       @game.state.start(@level)
 

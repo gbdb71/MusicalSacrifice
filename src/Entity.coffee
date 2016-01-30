@@ -28,10 +28,10 @@ class Entity
     if owned == @isRemote
       @isRemote = !owned
       if owned
-        console.log("We gained ownership of #{@type} #{@id}")
+        console.debug("We gained ownership of #{@type} #{@id}")
         @onGainOwnership()
       else
-        console.log("We lost ownership of #{@type} #{@id}")
+        console.debug("We lost ownership of #{@type} #{@id}")
         @onLoseOwnership()
 
   getState: ->

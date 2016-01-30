@@ -11,14 +11,12 @@ class Controller
     ]
     @kb = @game.input.keyboard
     @kb.addKeyCapture([
-      Phaser.Keyboard.W,
-      Phaser.Keyboard.A,
-      Phaser.Keyboard.S,
-      Phaser.Keyboard.D,
-      Phaser.Keyboard.UP,
+      Phaser.Keyboard.UP
       Phaser.Keyboard.DOWN,
       Phaser.Keyboard.LEFT,
       Phaser.Keyboard.RIGHT,
+      Phaser.Keyboard.ALT,
+      Phaser.Keyboard.CONTROL
     ])
 
   poll:=>
@@ -27,10 +25,7 @@ class Controller
       down: false
       left: false
       right: false
-      but1: false
-      but2: false
-      but3: false
-      but4: false
+      button: false
 
     _.each @pads, (pad)=>
       if !pad.connected
@@ -51,14 +46,8 @@ class Controller
          pad.axis(Phaser.Gamepad.XBOX360_STICK_RIGHT_X) > 0.2 or
          pad.isDown(Phaser.Gamepad.XBOX360_DPAD_RIGHT)
         moves.right = true
-      if pad.isDown(Phaser.Gamepad.XBOX360_Y)
-        moves.but1 = true
       if pad.isDown(Phaser.Gamepad.XBOX360_A)
-        moves.but2 = true
-      if pad.isDown(Phaser.Gamepad.XBOX360_X)
-        moves.but3 = true
-      if pad.isDown(Phaser.Gamepad.XBOX360_B)
-        moves.but4 = true
+        moves.button = true
 
     if @kb.isDown(Phaser.Keyboard.UP)
       moves.up = true
@@ -68,14 +57,9 @@ class Controller
       moves.left = true
     if @kb.isDown(Phaser.Keyboard.RIGHT)
       moves.right = true
-    if @kb.isDown(Phaser.Keyboard.W)
-      moves.but1 = true
-    if @kb.isDown(Phaser.Keyboard.S)
-      moves.but2 = true
-    if @kb.isDown(Phaser.Keyboard.A)
-      moves.but3 = true
-    if @kb.isDown(Phaser.Keyboard.D)
-      moves.but4 = true
+    if @kb.isDown(Phaser.Keyboard.ALT) or
+       @kb.isDown(Phaser.Keyboard.CONTROL)
+      moves.button = true
 
     moves
 
