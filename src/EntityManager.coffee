@@ -34,6 +34,7 @@ class EntityManager
     (Date.now() % 100000) + @game.network.myPeerId + @idCounter
 
   spawnRemoteEntity: (type, id, owner, state)->
+    return if @entities[id] # I told him we already got one!
     console.log("Spawning remote #{type} #{id} #{state} for #{owner}")
     @addEntity(type, id, true, owner, state)
 
