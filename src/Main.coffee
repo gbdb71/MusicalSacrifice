@@ -16,11 +16,10 @@ class Main extends Phaser.State
     @game.load.spritesheet('rachel', 'assets/rachel.png', 32, 32)
 
   init: ->
-    @game.physics.startSystem(Phaser.Physics.ARCADE)
     @game.stage.disableVisibilityChange = true
     @generator = new Phaser.RandomDataGenerator([(new Date()).getTime()])
 
-    @game.input.gamepad.start
+    @game.input.gamepad.start()
     @pads = [
       @game.input.gamepad.pad1,
       @game.input.gamepad.pad2,
@@ -105,31 +104,33 @@ class Main extends Phaser.State
       but3: false
       but4: false
 
-#   _.each @pads, (pad)=>
-#     if pad.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_Y) < -0.8 or
-#        pad.axis(Phaser.Gamepad.XBOX360_STICK_RIGHT_Y) < -0.8 or
-#        pad.isDown(Phaser.Gamepad.XBOX360_DPAD_UP)
-#       moves.up = true
-#     if pad.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_Y) > 0.8
-#        pad.axis(Phaser.Gamepad.XBOX360_STICK_RIGHT_Y) > 0.8 or
-#        pad.isDown(Phaser.Gamepad.XBOX360_DPAD_DOWN)
-#       moves.down = true
-#     if pad.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_X) < -0.8
-#        pad.axis(Phaser.Gamepad.XBOX360_STICK_RIGHT_X) < -0.8 or
-#        pad.isDown(Phaser.Gamepad.XBOX360_DPAD_LEFT)
-#       moves.left = true
-#     if pad.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_X) > 0.8
-#        pad.axis(Phaser.Gamepad.XBOX360_STICK_RIGHT_X) > 0.8 or
-#        pad.isDown(Phaser.Gamepad.XBOX360_DPAD_RIGHT)
-#       moves.right = true
-#     if pad.isDown(Phaser.Gamepad.XBOX360_Y)
-#       moves.but1 = true
-#     if pad.isDown(Phaser.Gamepad.XBOX360_A)
-#       moves.but2 = true
-#     if pad.isDown(Phaser.Gamepad.XBOX360_X)
-#       moves.but2 = true
-#     if pad.isDown(Phaser.Gamepad.XBOX360_B)
-#       moves.but2 = true
+    _.each @pads, (pad)=>
+      if !pad.connected
+        return
+      if pad.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_Y) < -0.2 or
+         pad.axis(Phaser.Gamepad.XBOX360_STICK_RIGHT_Y) < -0.2 or
+         pad.isDown(Phaser.Gamepad.XBOX360_DPAD_UP)
+        moves.up = true
+      if pad.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_Y) > 0.2 or
+         pad.axis(Phaser.Gamepad.XBOX360_STICK_RIGHT_Y) > 0.2 or
+         pad.isDown(Phaser.Gamepad.XBOX360_DPAD_DOWN)
+        moves.down = true
+      if pad.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_X) < -0.2 or
+         pad.axis(Phaser.Gamepad.XBOX360_STICK_RIGHT_X) < -0.2 or
+         pad.isDown(Phaser.Gamepad.XBOX360_DPAD_LEFT)
+        moves.left = true
+      if pad.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_X) > 0.2 or
+         pad.axis(Phaser.Gamepad.XBOX360_STICK_RIGHT_X) > 0.2 or
+         pad.isDown(Phaser.Gamepad.XBOX360_DPAD_RIGHT)
+        moves.right = true
+      if pad.isDown(Phaser.Gamepad.XBOX360_Y)
+        moves.but1 = true
+      if pad.isDown(Phaser.Gamepad.XBOX360_A)
+        moves.but2 = true
+      if pad.isDown(Phaser.Gamepad.XBOX360_X)
+        moves.but2 = true
+      if pad.isDown(Phaser.Gamepad.XBOX360_B)
+        moves.but2 = true
 
     if @kb.isDown(Phaser.Keyboard.UP)
       moves.up = true
