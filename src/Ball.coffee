@@ -10,6 +10,8 @@ class Ball extends MS.SingletonEntity
 
   init:->
     @sprite = @game.entityManager.group.create(-100,-100, 'ball')
+    @sprite.scale.set(2, 2)
+    @sprite.anchor.set(0.5, 0.5)
     @possessorId = null
     @catchable = false
     @kickTime = Date.now()
@@ -57,19 +59,22 @@ class Ball extends MS.SingletonEntity
     if @possessorId?
       possessor = @game.entityManager.entities[@possessorId]
       if possessor?
-        @sprite.position.x = possessor.sprite.position.x + 10
-        @sprite.position.y = possessor.sprite.position.y + 28
+        offset = possessor.direction.clone()
+        offset.setMagnitude(15)
+        @sprite.position.x = possessor.sprite.position.x + offset.x
+        @sprite.position.y = possessor.sprite.position.y + offset.y - 10
 
         moves = @game.controller.poll()
         if (moves.but1)
-          vector = possessor.sprite.body.acceleration.clone().setMagnitude(KICK_MAGNITUDE)
+          vector = possessor.direction.clone().setMagnitude(KICK_MAGNITUDE)
           @kick(vector)
 
     else if @catchable
       # get all avatars and see if any are overlapping
       avatars = @game.entityManager.getEntitiesOfType("Avatar")
       _.each(avatars, (avatar)=>
-        if Phaser.Rectangle.intersects(avatar.sprite.getBounds(), @sprite.getBounds())
+        hitbox = new Phaser.Rectangle(avatar.sprite.position.x, avatar.sprite.position.y - 25, 30, 30)
+        if Phaser.Rectangle.intersects(hitbox, @sprite.getBounds())
           @possessorId = avatar.id
           @game.entityManager.grantOwnership(this, avatar.owner)
           @catchable = false

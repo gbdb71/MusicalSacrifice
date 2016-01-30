@@ -1,7 +1,12 @@
 class SoccerState extends Phaser.State
   init: ->
+    # @game.entityManager.startState()
 
   create: ->
+    pitch = @game.add.sprite(@game.world.centerX, @game.world.centerY, 'soccer')
+    pitch.anchor.setTo(0.5, 0.5)
+    pitch.width = 800
+    pitch.height = 450
     @spriteGroup = @game.add.group()
     @game.physics.arcade.enable(@spriteGroup)
     @game.entityManager.setGroup(@spriteGroup)
@@ -12,5 +17,8 @@ class SoccerState extends Phaser.State
   update:->
     @spriteGroup.sort('y', Phaser.Group.SORT_ASCENDING)
     @game.entityManager.update()
+
+  shutdown:->
+    # @game.entityManager.endState()
 
 MusicalSacrifice.SoccerState = SoccerState
