@@ -1,22 +1,7 @@
 Musical Sacrifice
 =================
 
-Local multiplayer web game thing.
-
-Install
--------
-
-`bundle install`
-
-Run
----
-
-`bundle exec middleman`
-
-Deploy
-------
-
-`rake`
+Local multiplayer web game thing. Made for GGJ16.
 
 Copyright
 ---------
