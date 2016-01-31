@@ -44,9 +44,6 @@ class Ball extends MS.SingletonEntity
   getTimeSinceKick:->
     Date.now() - @kickTime
 
-  getSpeed:->
-    @sprite.body.velocity.x**2 + @sprite.body.velocity.y**2
-
   setState:(state)->
     if !@spawned
       @sprite.position.x = state.x
@@ -61,12 +58,16 @@ class Ball extends MS.SingletonEntity
       blend.to({ x: state.x, y: state.y + 6 }, @rate, Phaser.Easing.Linear.None, true, 0, 0)
     @possessorId = state.possessorId
     @catchable = state.catchable
+    if @sprite.animations.currentAnim? && @sprite.animations.currentAnim.name != state.anim
+      @sprite.animations.play(state.anim)
 
   getState:(state)->
     x: @sprite.position.x,
     y: @sprite.position.y,
     possessorId: @possessorId
     catchable: @catchable
+    anim: @sprite.animations.currentAnim.name
+    angular: @sprite.body.angularVelocity
 
   remove: ->
     @sprite.kill()
