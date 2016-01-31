@@ -46,6 +46,7 @@ class Controller
     @kb.addKey(Phaser.Keyboard.W).onDown.add(@type, @, 0, 'w')
     @kb.addKey(Phaser.Keyboard.X).onDown.add(@type, @, 0, 'x')
     @kb.addKey(Phaser.Keyboard.Y).onDown.add(@type, @, 0, 'y')
+    @kb.addKey(Phaser.Keyboard.Z).onDown.add(@type, @, 0, 'z')
     @kb.addKey(Phaser.Keyboard.ZERO).onDown.add(@type, @, 0, '0', ')')
     @kb.addKey(Phaser.Keyboard.ONE).onDown.add(@type, @, 0, '1', '!')
     @kb.addKey(Phaser.Keyboard.TWO).onDown.add(@type, @, 0, '2', '@')
