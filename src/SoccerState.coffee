@@ -18,7 +18,9 @@ class SoccerState extends Phaser.State
     @game.entityManager.setPlayerGroup(@playerGroup)
     @game.entityManager.setBackgroundGroup(@backgroundGroup)
     @game.entityManager.startLevel()
-    @playerAvatar = @game.entityManager.spawnOwnedEntity('Avatar', {x:400, y:225})
+    spawnX = @game.generator.integerInRange(100, 700)
+    spawnY = @game.generator.integerInRange(100, 350)
+    @playerAvatar = @game.entityManager.spawnOwnedEntity('Avatar', {x:spawnX, y:spawnY})
 
     style =
       font: "70px Courier"
