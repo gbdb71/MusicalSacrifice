@@ -103,6 +103,10 @@ class Ball extends MS.SingletonEntity
     return unless @sprite.alive
     return unless @sprite.body?
 
+    # remove any left over blending from when we weren't the owner of the entity
+    @blend?.stop()
+    @blend2?.stop()
+
     velocity = @sprite.body.velocity
     @sprite.rotation = 0 if isNaN(@sprite.rotation)
 
@@ -147,10 +151,8 @@ class Ball extends MS.SingletonEntity
     else
       @angular = velocity.x * 7
       @angle = 0
-      @angle = @sprite.angle
       if Math.abs(@angular) < 10
         @angular = 0
-        @angle *= 0.4
 
     if !@possessorId && @catchable
       # get all avatars and see if any are overlapping
