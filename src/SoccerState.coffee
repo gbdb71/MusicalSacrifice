@@ -27,6 +27,12 @@ class SoccerState extends Phaser.State
     @text.anchor.setTo(0.5, 0.5)
     @text.alpha = 0.5
 
+    style =
+      font: "20px Courier"
+      fill: "#00ff44"
+      align: "center"
+    @status = @game.add.text(@game.world.centerX, 13, "Pass to everyone!", style)
+    @status.anchor.setTo(0.5, 0.5)
     @possessors = []
 
   update:->
@@ -43,6 +49,15 @@ class SoccerState extends Phaser.State
     return if balls.length == 0
 
     possessorId = balls[0].possessorId
+
+    if Date.now() - @createdAt > 3000
+      # give people a change to read the intro
+      avatar = @game.entityManager.entities[possessorId]
+      if avatar
+        @status.setText("#{avatar.skin} has the ball!")
+      else
+        @status.setText("Grab the ball!")
+
     if possessorId not in @possessors
       @possessors.push possessorId
       console.debug("Soccer sees that #{@possessors} have had the ball")
@@ -52,6 +67,6 @@ class SoccerState extends Phaser.State
         # if we're the boss, tell the gamemaster
         # if we're not the authoritative GM then it'll get ignored
         gm = @game.entityManager.getEntitiesOfType("GameMaster")[0]
-        gm.endLevel("Noice Passing!") if gm
+        gm.endLevel("Everyone had a touch!\nNoice Passing!") if gm
 
 MusicalSacrifice.SoccerState = SoccerState
