@@ -25,7 +25,7 @@ class Avatar extends MS.Entity
     @col = @game.generator.pick([0, 1, 2, 3])
     @sprite = @game.entityManager.group.create(-100,-100, @skin)
     @sprite.scale.set(2, 2)
-    @sprite.anchor.set(0.5, 1)
+    @sprite.anchor.set(0.5, 0.9)
     @setAnimations()
 
   setAnimations: ->

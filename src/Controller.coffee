@@ -14,9 +14,7 @@ class Controller
       Phaser.Keyboard.UP
       Phaser.Keyboard.DOWN,
       Phaser.Keyboard.LEFT,
-      Phaser.Keyboard.RIGHT,
-      Phaser.Keyboard.ALT,
-      Phaser.Keyboard.CONTROL
+      Phaser.Keyboard.RIGHT
     ])
 
   init:->

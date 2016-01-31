@@ -29,7 +29,9 @@ class EntityManager
       @spawnOwnedEntity("GameMaster")
     , DELAY
 
-  setGroup: (@group)->
+  setPlayerGroup: (@group)->
+
+  setBackgroundGroup: (@background)->
 
   getNewId:->
     @idCounter += 1

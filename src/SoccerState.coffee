@@ -7,9 +7,11 @@ class SoccerState extends Phaser.State
     pitch.anchor.setTo(0.5, 0.5)
     pitch.width = 800
     pitch.height = 450
-    @spriteGroup = @game.add.group()
-    @game.physics.arcade.enable(@spriteGroup)
-    @game.entityManager.setGroup(@spriteGroup)
+    @backgroundGroup = @game.add.group()
+    @playerGroup = @game.add.group()
+    @game.physics.arcade.enable(@playerGroup)
+    @game.entityManager.setPlayerGroup(@playerGroup)
+    @game.entityManager.setBackgroundGroup(@backgroundGroup)
     @game.entityManager.startLevel()
     avatar = @game.entityManager.spawnOwnedEntity('Avatar', {x:400, y:225})
     @game.entityManager.spawnOwnedEntity('Ball', {x:400, y:225, possessorId: avatar.id})
@@ -22,7 +24,7 @@ class SoccerState extends Phaser.State
     @text.alpha = 0.5
 
   update:->
-    @spriteGroup.sort('y', Phaser.Group.SORT_ASCENDING)
+    @playerGroup.sort('y', Phaser.Group.SORT_ASCENDING)
     @game.entityManager.update()
     @text.setText(@game.controller.buffer)
 
