@@ -1,6 +1,7 @@
 class ActingState extends Phaser.State
   init: ->
     @game.controller.init()
+    @createdAt = Date.now()
 
   create: ->
     pitch = @game.add.sprite(@game.world.centerX, @game.world.centerY, 'acting')
@@ -26,5 +27,8 @@ class ActingState extends Phaser.State
     @playerGroup.sort('y', Phaser.Group.SORT_ASCENDING)
     @game.entityManager.update()
     @text.setText(@game.controller.buffer)
+    if Date.now() - @createdAt > 30000
+      gm = @game.entityManager.getEntitiesOfType("GameMaster")[0]
+      gm.endLevel("Time's up!") if gm
 
 MusicalSacrifice.ActingState = ActingState

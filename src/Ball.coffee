@@ -59,10 +59,12 @@ class Ball extends MS.SingletonEntity
       @sprite.shadow.position.y = @sprite.position.y + 6
       @spawned = true
     else
-      blend = @game.add.tween(@sprite)
-      blend.to({ x: state.x, y: state.y }, @rate, Phaser.Easing.Linear.None, true, 0, 0)
-      blend = @game.add.tween(@sprite.shadow)
-      blend.to({ x: state.x, y: state.y + 6 }, @rate, Phaser.Easing.Linear.None, true, 0, 0)
+      @blend.stop() if @blend?
+      @blend2.stop() if @blend2?
+      @blend = @game.add.tween(@sprite)
+      @blend.to({ x: state.x, y: state.y }, @rate, Phaser.Easing.Linear.None, true, 0, 0)
+      @blend2 = @game.add.tween(@sprite.shadow)
+      @blend2.to({ x: state.x, y: state.y + 6 }, @rate, Phaser.Easing.Linear.None, true, 0, 0)
     if @possessorId != state.possessorId
       @possessorId = state.possessorId
     @catchable = state.catchable
@@ -75,6 +77,8 @@ class Ball extends MS.SingletonEntity
       if @angular == 0
         @sprite.angle = @angle
       @sprite.rotation = 0 if isNaN(@sprite.rotation)
+      @sprite.body.velocity.x = 0
+      @sprite.body.velocity.y = 0
 
   getState:->
     if @sprite.body?

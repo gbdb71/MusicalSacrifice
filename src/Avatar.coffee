@@ -50,8 +50,9 @@ class Avatar extends MS.Entity
       @sprite.position.y = state.y
       @spawned = true
     else
-      blend = @game.add.tween(@sprite)
-      blend.to({ x: state.x, y: state.y }, @rate, Phaser.Easing.Linear.None, true, 0, 0)
+      @blend.stop() if @blend?
+      @blend = @game.add.tween(@sprite)
+      @blend.to({ x: state.x, y: state.y }, @rate, Phaser.Easing.Linear.None, true, 0, 0)
     if @sprite.animations.currentAnim? && @sprite.animations.currentAnim.name != state.anim
       @sprite.animations.play(state.anim)
     if state.skin && (@skin != state.skin[0] || @row != state.skin[1] || @col != state.skin[2])
