@@ -64,7 +64,7 @@ class Avatar extends MS.Entity
     x: @sprite.position.x,
     y: @sprite.position.y,
     skin: [@skin, @row, @col],
-    anim: @sprite.animations.currentAnim.name
+    anim: @sprite.animations.currentAnim?.name
     message: @caption?.message
 
   remove:->

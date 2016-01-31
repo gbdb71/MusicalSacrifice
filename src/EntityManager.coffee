@@ -188,4 +188,7 @@ class EntityManager
   getEntitiesOfType:(type)->
     _.filter(@entities, (entity)-> entity.type == type)
 
+  getGM:->
+    @getEntitiesOfType("GameMaster")[0]
+
 MS.EntityManager = EntityManager

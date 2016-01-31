@@ -70,7 +70,7 @@ class Ball extends MS.SingletonEntity
     y: @sprite.position.y,
     possessorId: @possessorId
     catchable: @catchable
-    anim: @sprite.animations.currentAnim.name
+    anim: @sprite.animations.currentAnim?.name
     angular: @sprite.body?.angularVelocity
 
   remove: ->
