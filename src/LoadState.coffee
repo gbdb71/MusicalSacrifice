@@ -24,6 +24,9 @@ class LoadState extends Phaser.State
     @game.load.spritesheet('ball', 'assets/skull.png', 16, 16)
     @game.load.image('shadow', 'assets/shadow.png')
     @game.load.image('soccer', 'assets/soccer.jpg')
+    @game.load.image('cleaning', 'assets/cleaning.jpg')
+    @game.load.image('acting', 'assets/acting.jpg')
+    @game.load.image('killing', 'assets/killing.jpg')
 
   loadUpdate:->
     @progress = @game.load.progress
