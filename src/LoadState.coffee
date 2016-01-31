@@ -27,6 +27,7 @@ class LoadState extends Phaser.State
     @game.load.image('cleaning', 'assets/cleaning.jpg')
     @game.load.image('acting', 'assets/acting.jpg')
     @game.load.image('killing', 'assets/killing.jpg')
+    @game.load.image('william', 'assets/shakespeare.jpg')
 
   loadUpdate:->
     @progress = @game.load.progress
