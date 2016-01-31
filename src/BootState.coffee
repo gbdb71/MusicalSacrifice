@@ -19,7 +19,7 @@ class BootState extends Phaser.State
     @game.scale.pageAlignHorizontally = true
     @game.state.add("Load", MS.LoadState)
     @game.state.add("Lobby", MS.LobbyState)
-    @game.state.add("Soccer", MS.SoccerState)
+    @game.state.add("Yorick", MS.SoccerState)
     @game.state.add("Cleaning", MS.CleaningState)
     @game.state.add("Acting", MS.ActingState)
     @game.state.add("Killing", MS.KillingState)

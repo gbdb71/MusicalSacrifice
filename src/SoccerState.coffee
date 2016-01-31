@@ -6,6 +6,9 @@ class SoccerState extends Phaser.State
     @ballSpawnDelaytimer = @game.generator.pick([0, 100, 200, 300, 400, 500])
     @ballSpawned = false
     @theBallId = null
+    @currentPossessor = null
+    @passGoal = 10
+    @passes = 0
 
   create: ->
     pitch = @game.add.sprite(@game.world.centerX, @game.world.centerY, 'soccer')
@@ -34,9 +37,13 @@ class SoccerState extends Phaser.State
       font: "20px Courier"
       fill: "#00ff44"
       align: "center"
-    @status = @game.add.text(@game.world.centerX, 13, "Pass to everyone!", style)
+    @status = @game.add.text(@game.world.centerX, 13, "Alas, poor Yorick. Everyone, let's have a kick!", style)
     @status.anchor.setTo(0.5, 0.5)
     @possessors = []
+
+  getScore:->
+    "Passes made: #{@passes}/#{@passGoal}"
+
 
   update:->
     if !@ballSpawned && (Date.now() - @createdAt > @ballSpawnDelaytimer)
@@ -58,23 +65,29 @@ class SoccerState extends Phaser.State
 
     possessorId = ball.possessorId
 
+    # track number of passes
+    if possessorId? && @currentPossessor != possessorId
+      if @currentPossessor?
+        @passes += 1
+      @currentPossessor = possessorId
+
     if Date.now() - @createdAt > 3000
       # give people a chance to read the intro
       avatar = @game.entityManager.entities[possessorId]
-      if avatar
-        @status.setText("#{avatar.skin} has the ball!")
-      else
-        @status.setText("Grab the ball!")
+      @status.setText(@getScore())
 
     if possessorId not in @possessors
       @possessors.push possessorId
       console.debug("Soccer sees that #{@possessors} have had the ball")
       # check everyone has had a dribble
+    if @passes >= @passGoal
       if _.all(@game.entityManager.getEntitiesOfType("Avatar"), (avatar)=> avatar.id in @possessors) && @possessors.length > 1
         # game over man!
         # if we're the boss, tell the gamemaster
         # if we're not the authoritative GM then it'll get ignored
         gm = @game.entityManager.getEntitiesOfType("GameMaster")[0]
         gm.endLevel("Everyone had a touch!\nNoice Passing!") if gm
+      else
+        @status.setText("Not everyone has had a go!")
 
 MusicalSacrifice.SoccerState = SoccerState
