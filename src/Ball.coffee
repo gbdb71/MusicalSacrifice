@@ -51,11 +51,14 @@ class Ball extends MS.SingletonEntity
     if !@spawned
       @sprite.position.x = state.x
       @sprite.position.y = state.y
+      @sprite.shadow.position.x = @sprite.position.x
+      @sprite.shadow.position.y = @sprite.position.y + 6
       @spawned = true
     else
       blend = @game.add.tween(@sprite)
       blend.to({ x: state.x, y: state.y }, @rate, Phaser.Easing.Linear.None, true, 0, 0)
-    @blend = @game.add.tween(@sprite)
+      blend = @game.add.tween(@sprite.shadow)
+      blend.to({ x: state.x, y: state.y + 6 }, @rate, Phaser.Easing.Linear.None, true, 0, 0)
     @possessorId = state.possessorId
     @catchable = state.catchable
 
@@ -67,6 +70,7 @@ class Ball extends MS.SingletonEntity
 
   remove: ->
     @sprite.kill()
+    @sprite.shadow.kill()
 
   controlledUpdate:->
     return unless @sprite.alive
