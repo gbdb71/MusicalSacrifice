@@ -64,7 +64,7 @@ class Avatar extends MS.Entity
       @setCaption(state.message)
     @updateCaption(state.x, state.y, 15-@sprite.height)
 
-  getState:(state)->
+  getState:->
     x: @sprite.position.x,
     y: @sprite.position.y,
     dx: @direction.x,

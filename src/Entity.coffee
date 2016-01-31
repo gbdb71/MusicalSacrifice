@@ -11,9 +11,6 @@ class Entity
 
     @init()
 
-    if !@isRemote
-      @onGainOwnership()
-
   update:(send)->
     return if @isRemote
 

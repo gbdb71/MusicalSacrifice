@@ -14,7 +14,8 @@ class Controller
       Phaser.Keyboard.UP
       Phaser.Keyboard.DOWN,
       Phaser.Keyboard.LEFT,
-      Phaser.Keyboard.RIGHT
+      Phaser.Keyboard.RIGHT,
+      Phaser.Keyboard.ALT
     ])
 
   init:->
@@ -118,8 +119,7 @@ class Controller
       moves.left = true
     if @kb.isDown(Phaser.Keyboard.RIGHT)
       moves.right = true
-    if @kb.isDown(Phaser.Keyboard.ALT) or
-       @kb.isDown(Phaser.Keyboard.CONTROL)
+    if @kb.isDown(Phaser.Keyboard.ALT)
       moves.button = true
 
     moves

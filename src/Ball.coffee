@@ -16,6 +16,7 @@ class Ball extends MS.SingletonEntity
     @sprite.shadow.scale.set(1.5, 1.5)
     @sprite.shadow.anchor.set(0.5, 0.5)
 
+    @angular = 0
     @possessorId = null
     @catchable = false
     @kickTime = Date.now()
@@ -24,16 +25,19 @@ class Ball extends MS.SingletonEntity
     @sprite.animations.add("down", [6, 5, 4, 3, 2, 1, 0], 20, true)
     @sprite.animations.play("idle")
 
+    @game.physics.arcade.enable(@sprite)
+    if !@isRemote
+      @onGainOwnership()
+
   onLoseOwnership:->
-    if !!@sprite.body?
-      @sprite.body = null
+    @sprite.body.drag.set(0, 0)
+    @sprite.body.collideWorldBounds = false
+    @sprite.body.bounce.set(0, 0)
 
   onGainOwnership:->
-    if !@sprite.body?
-      @game.physics.arcade.enable(@sprite)
-      @sprite.body.drag.set(DRAG, DRAG)
-      @sprite.body.collideWorldBounds = true
-      @sprite.body.bounce.set(0.9,0.9)
+    @sprite.body.drag.set(DRAG, DRAG)
+    @sprite.body.collideWorldBounds = true
+    @sprite.body.bounce.set(0.9, 0.9)
 
   kick:(vector)->
     @rolling = true
@@ -45,6 +49,8 @@ class Ball extends MS.SingletonEntity
     Date.now() - @kickTime
 
   setState:(state)->
+    @angular = state.angular
+    @dampen = state.dampen
     if !@spawned
       @sprite.position.x = state.x
       @sprite.position.y = state.y
@@ -61,14 +67,21 @@ class Ball extends MS.SingletonEntity
     @catchable = state.catchable
     if @sprite.animations.currentAnim? && @sprite.animations.currentAnim.name != state.anim
       @sprite.animations.play(state.anim)
+    if @sprite.body?
+      @sprite.rotation = 0 if _.isNaN?(@sprite.rotation)
+      @sprite.body.angularVelocity = @angular
+      @sprite.rotation *= 0.8 if @dampen
 
-  getState:(state)->
+  getState:->
+    if @sprite.body?
+      @sprite.rotation = 0 if _.isNaN?(@sprite.rotation)
     x: @sprite.position.x,
     y: @sprite.position.y,
     possessorId: @possessorId
     catchable: @catchable
     anim: @sprite.animations.currentAnim?.name
-    angular: @sprite.body?.angularVelocity
+    angular: @angular
+    dampen: @dampen
 
   remove: ->
     @sprite.kill()
@@ -99,16 +112,17 @@ class Ball extends MS.SingletonEntity
     @sprite.shadow.position.x = @sprite.position.x
     @sprite.shadow.position.y = @sprite.position.y + 6
 
-    @sprite.body.angularVelocity = velocity.x * 7
+    @angular = velocity.x * 7
+    @dampen = false
     anim = "idle"
     if velocity.y > 10
-      @sprite.body.angularVelocity = 0
-      @sprite.angle *= 0.9
       anim = "up"
+      @dampen = true
     else if velocity.y < -10
-      @sprite.body.angularVelocity = 0
-      @sprite.angle *= 0.9
       anim = "down"
+      @dampen = true
+    @sprite.body.angularVelocity = @angular
+    @sprite.rotation *= 0.8 if @dampen
     if @sprite.animations.currentAnim.name != anim
       @sprite.animations.play(anim)
 

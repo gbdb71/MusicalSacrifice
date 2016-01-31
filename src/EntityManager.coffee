@@ -39,7 +39,7 @@ class EntityManager
 
   spawnRemoteEntity: (type, id, owner, state)->
     return if @entities[id] # I told him we already got one!
-    console.info("Spawning remote #{type} #{id} #{state} for #{owner}")
+    console.info("Spawning remote #{type} #{id} for #{owner}: ", state)
     @addEntity(type, id, true, owner, state)
 
   spawnOwnedEntity: (type, state={})->
