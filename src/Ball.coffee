@@ -36,10 +36,8 @@ class Ball extends MS.SingletonEntity
       @sprite.body.bounce.set(0.9,0.9)
 
   kick:(vector)->
-    console.log('Kicking')
     @rolling = true
     @sprite.body.velocity = vector
-    console.debug("Setting Ball possessor to #{null}")
     @possessorId = null
     @kickTime = Date.now()
 
@@ -59,7 +57,6 @@ class Ball extends MS.SingletonEntity
       blend = @game.add.tween(@sprite.shadow)
       blend.to({ x: state.x, y: state.y + 6 }, @rate, Phaser.Easing.Linear.None, true, 0, 0)
     if @possessorId != state.possessorId
-      console.debug("Been told to set possessor to #{state.possessorId} #{@game.entityManager.entities[state.possessorId]?.owner}")
       @possessorId = state.possessorId
     @catchable = state.catchable
     if @sprite.animations.currentAnim? && @sprite.animations.currentAnim.name != state.anim
@@ -119,9 +116,14 @@ class Ball extends MS.SingletonEntity
       # get all avatars and see if any are overlapping
       avatars = @game.entityManager.getEntitiesOfType("Avatar")
       _.each(avatars, (avatar)=>
-        hitbox = new Phaser.Rectangle(avatar.sprite.position.x, avatar.sprite.position.y - 25, 30, 30)
-        if Phaser.Rectangle.intersects(hitbox, @sprite.getBounds())
-          console.debug("Setting Ball possessor to #{avatar.id} #{avatar.owner}")
+        offset = avatar.direction.clone()
+        centre = new Phaser.Point
+        centre.x = avatar.sprite.position.x + offset.x * 2 - 4
+        centre.y = avatar.sprite.position.y + offset.y - 6
+        if offset.y < 0
+          centre.y -= 7
+        zoneOfInfluence = new Phaser.Rectangle(centre.x, centre.y, 12, 12)
+        if Phaser.Rectangle.intersects(zoneOfInfluence, @sprite.getBounds())
           @possessorId = avatar.id
           @catchable = false
           # give the ball away if need be

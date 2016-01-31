@@ -4,6 +4,9 @@
 #= require LoadState
 #= require LobbyState
 #= require SoccerState
+#= require CleaningState
+#= require ActingState
+#= require KillingState
 
 MS = window.MusicalSacrifice
 
@@ -17,6 +20,9 @@ class BootState extends Phaser.State
     @game.state.add("Load", MS.LoadState)
     @game.state.add("Lobby", MS.LobbyState)
     @game.state.add("Soccer", MS.SoccerState)
+    @game.state.add("Cleaning", MS.CleaningState)
+    @game.state.add("Acting", MS.ActingState)
+    @game.state.add("Killing", MS.KillingState)
     @game.generator = new Phaser.RandomDataGenerator([(new Date()).getTime()])
 
   create:->

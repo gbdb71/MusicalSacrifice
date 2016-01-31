@@ -30,17 +30,21 @@ class Avatar extends MS.Entity
 
   setAnimations: ->
     top = @row*48 + @col*3
-    @sprite.animations.add("idle", [top + 1], 10, true)
+    @sprite.animations.add("idle_down", [top + 1], 10, true)
     @sprite.animations.add("down", [top, top+1, top+2], 10, true)
     top += 12
+    @sprite.animations.add("idle_left", [top + 1], 10, true)
     @sprite.animations.add("left", [top, top+1, top+2], 10, true)
     top += 12
+    @sprite.animations.add("idle_right", [top + 1], 10, true)
     @sprite.animations.add("right", [top, top+1, top+2], 10, true)
     top += 12
+    @sprite.animations.add("idle_up", [top + 1], 10, true)
     @sprite.animations.add("up", [top, top+1, top+2], 10, true)
-    @sprite.animations.play("idle")
+    @sprite.animations.play("idle_down")
 
   setState:(state)->
+    @direction.set(state.dx, state.dy)
     if !@spawned
       @sprite.position.x = state.x
       @sprite.position.y = state.y
@@ -63,6 +67,8 @@ class Avatar extends MS.Entity
   getState:(state)->
     x: @sprite.position.x,
     y: @sprite.position.y,
+    dx: @direction.x,
+    dy: @direction.y,
     skin: [@skin, @row, @col],
     anim: @sprite.animations.currentAnim?.name
     message: @caption?.message
@@ -81,26 +87,44 @@ class Avatar extends MS.Entity
 
     moves = @game.controller.poll()
 
-    @direction.set(0, 0)
+    newDirection = new Phaser.Point
     if (moves.left)
-      @direction.x = -1
+      newDirection.x = -1
     if (moves.right)
-      @direction.x = 1
+      newDirection.x = 1
     if (moves.up)
-      @direction.y = -1
+      newDirection.y = -1
     if (moves.down)
-      @direction.y = 1
-    acceleration = @direction.clone()
+      newDirection.y = 1
+    acceleration = newDirection.clone()
     acceleration.setMagnitude(ACCELERATION)
     @sprite.body.acceleration = acceleration
-    if @direction.isZero()
-      @direction.y = 1
+    if !newDirection.isZero()
+      @direction.x = newDirection.x
+      @direction.y = newDirection.y
+    else if @direction.isZero()
+      if Math.abs(@sprite.body.velocity.x) > Math.abs(@sprite.body.velocity.y)
+        if @sprite.body.velocity.x > 0
+          @direction.x = 1
+        else
+          @direction.x = -1
+      else
+        if @sprite.body.velocity.y < 0
+          @direction.y = -1
+        else
+          @direction.y = 1
     max_velocity = new Phaser.Point(MAX_SPEED, MAX_SPEED)
     if @sprite.body.velocity.getMagnitude() > MAX_SPEED
       max_velocity.setMagnitude(MAX_SPEED)
     @sprite.body.maxVelocity = max_velocity
 
-    anim = "idle"
+    anim = "idle_down"
+    if @direction.y == -1
+      anim = "idle_up"
+    else if @direction.x == 1
+      anim = "idle_right"
+    else if @direction.x == -1
+      anim = "idle_left"
     if Math.abs(@sprite.body.velocity.x) > Math.abs(@sprite.body.velocity.y)
       if @sprite.body.velocity.x > 25
         anim = "right"
