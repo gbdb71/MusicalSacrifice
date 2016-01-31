@@ -36,8 +36,10 @@ class Ball extends MS.SingletonEntity
       @sprite.body.bounce.set(0.9,0.9)
 
   kick:(vector)->
+    console.log('Kicking')
     @rolling = true
     @sprite.body.velocity = vector
+    console.debug("Setting Ball possessor to #{null}")
     @possessorId = null
     @kickTime = Date.now()
 
@@ -56,7 +58,9 @@ class Ball extends MS.SingletonEntity
       blend.to({ x: state.x, y: state.y }, @rate, Phaser.Easing.Linear.None, true, 0, 0)
       blend = @game.add.tween(@sprite.shadow)
       blend.to({ x: state.x, y: state.y + 6 }, @rate, Phaser.Easing.Linear.None, true, 0, 0)
-    @possessorId = state.possessorId
+    if @possessorId != state.possessorId
+      console.debug("Been told to set possessor to #{state.possessorId} #{@game.entityManager.entities[state.possessorId]?.owner}")
+      @possessorId = state.possessorId
     @catchable = state.catchable
     if @sprite.animations.currentAnim? && @sprite.animations.currentAnim.name != state.anim
       @sprite.animations.play(state.anim)
@@ -67,7 +71,7 @@ class Ball extends MS.SingletonEntity
     possessorId: @possessorId
     catchable: @catchable
     anim: @sprite.animations.currentAnim.name
-    angular: @sprite.body.angularVelocity
+    angular: @sprite.body?.angularVelocity
 
   remove: ->
     @sprite.kill()
@@ -75,10 +79,13 @@ class Ball extends MS.SingletonEntity
 
   controlledUpdate:->
     return unless @sprite.alive
+    return unless @sprite.body?
+
     velocity = @sprite.body.velocity
+
     if @possessorId?
       possessor = @game.entityManager.entities[@possessorId]
-      if possessor?
+      if possessor? && possessor.sprite.body?
         velocity = possessor.sprite.body.velocity
         offset = possessor.direction.clone()
         offset.setMagnitude(15)
@@ -90,18 +97,11 @@ class Ball extends MS.SingletonEntity
         if (moves.button)
           vector = possessor.direction.clone().setMagnitude(KICK_MAGNITUDE)
           @kick(vector)
-    else if @catchable
-      # get all avatars and see if any are overlapping
-      avatars = @game.entityManager.getEntitiesOfType("Avatar")
-      _.each(avatars, (avatar)=>
-        hitbox = new Phaser.Rectangle(avatar.sprite.position.x, avatar.sprite.position.y - 25, 30, 30)
-        if Phaser.Rectangle.intersects(hitbox, @sprite.getBounds())
-          @possessorId = avatar.id
-          @game.entityManager.grantOwnership(this, avatar.owner)
-          @catchable = false
-          return
-        )
+
     @catchable = @getTimeSinceKick() > CATCH_COOLDOWN
+    @sprite.shadow.position.x = @sprite.position.x
+    @sprite.shadow.position.y = @sprite.position.y + 6
+
     @sprite.body.angularVelocity = velocity.x * 7
     anim = "idle"
     if velocity.y > 10
@@ -114,8 +114,23 @@ class Ball extends MS.SingletonEntity
       anim = "down"
     if @sprite.animations.currentAnim.name != anim
       @sprite.animations.play(anim)
-    @sprite.shadow.position.x = @sprite.position.x
-    @sprite.shadow.position.y = @sprite.position.y + 6
+
+    if !@possessorId && @catchable
+      # get all avatars and see if any are overlapping
+      avatars = @game.entityManager.getEntitiesOfType("Avatar")
+      _.each(avatars, (avatar)=>
+        hitbox = new Phaser.Rectangle(avatar.sprite.position.x, avatar.sprite.position.y - 25, 30, 30)
+        if Phaser.Rectangle.intersects(hitbox, @sprite.getBounds())
+          console.debug("Setting Ball possessor to #{avatar.id} #{avatar.owner}")
+          @possessorId = avatar.id
+          @catchable = false
+          # give the ball away if need be
+          if @game.network.myPeerId != avatar.owner
+            @game.entityManager.grantOwnership(this, avatar.owner)
+          # send an extra update to ensure the possession message is there
+          @updateRemotes()
+          return
+        )
     super
 
 MS.Ball = Ball

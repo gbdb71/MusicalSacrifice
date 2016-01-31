@@ -126,6 +126,7 @@ class EntityManager
       id: entity.id
 
   broadcastGrantOwnership:(entity, newOwner)->
+    console.debug("Sending grant ownership message")
     @game.network.broadcastToAllChannels
       message: "grantOwnership",
       id: entity.id,
@@ -175,7 +176,7 @@ class EntityManager
     send = false
     if elapsed > RATE
       send = true
-      @epoch += RATE
+      @epoch += RATE #should be now ? so it will 'catch up' rather than back up when update is slowed down.
     _.each @getMyEntities(), (entity)-> entity.update(send)
 
   getMyEntities:->
