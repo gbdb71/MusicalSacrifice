@@ -29,13 +29,16 @@ class Ball extends MS.SingletonEntity
     @game.physics.arcade.enable(@sprite)
     if !@isRemote
       @onGainOwnership()
+    @sprite.rotation = 0 if isNaN(@sprite.rotation)
 
   onLoseOwnership:->
+    @sprite.rotation = 0 if isNaN(@sprite.rotation)
     @sprite.body.drag.set(0, 0)
     @sprite.body.collideWorldBounds = false
     @sprite.body.bounce.set(0, 0)
 
   onGainOwnership:->
+    @sprite.rotation = 0 if isNaN(@sprite.rotation)
     @sprite.body.drag.set(DRAG, DRAG)
     @sprite.body.collideWorldBounds = true
     @sprite.body.bounce.set(0.9, 0.9)
@@ -50,6 +53,7 @@ class Ball extends MS.SingletonEntity
     Date.now() - @kickTime
 
   setState:(state)->
+    @sprite.rotation = 0 if isNaN(@sprite.rotation)
     if !@spawned
       @sprite.position.x = state.x
       @sprite.position.y = state.y
@@ -68,15 +72,14 @@ class Ball extends MS.SingletonEntity
     @angular = state.angular
     @angle = state.angle
     if @sprite.body?
-      @sprite.rotation = 0 if _.isNaN?(@sprite.rotation)
       @sprite.animations.play(@anim)
       @sprite.body.angularVelocity = @angular
       if @angular == 0
         @sprite.angle = @angle
 
   getState:->
+    @sprite.rotation = 0 if isNaN(@sprite.rotation)
     if @sprite.body?
-      @sprite.rotation = 0 if _.isNaN?(@sprite.rotation)
       @sprite.animations.play(@anim)
       @sprite.body.angularVelocity = @angular
       if @angular == 0
@@ -139,7 +142,9 @@ class Ball extends MS.SingletonEntity
         @angle = 180
     else
       @angular = velocity.x * 7
-      @angle = @sprite.angle
+      @angle = 0
+      if !isNaN(@sprite.angle)
+        @angle = @sprite.angle
       if Math.abs(@angular) < 10
         @angular = 0
         @angle *= 0.4
