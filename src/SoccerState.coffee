@@ -3,8 +3,9 @@ class SoccerState extends Phaser.State
     @game.controller.init()
     @createdAt = Date.now()
     # to prevent most redundant ball spawns
-    @ballSpawnDelaytimer = @game.generator.pick([0, 500, 1000, 1500, 2000, 2500])
+    @ballSpawnDelaytimer = @game.generator.pick([0, 100, 200, 300, 400, 500])
     @ballSpawned = false
+    @theBallId = null
 
   create: ->
     pitch = @game.add.sprite(@game.world.centerX, @game.world.centerY, 'soccer')
@@ -45,13 +46,18 @@ class SoccerState extends Phaser.State
     @text.setText(@game.controller.buffer)
 
     # see who is dribbling the ball
-    balls = @game.entityManager.getEntitiesOfType("Ball")
-    return if balls.length == 0
+    ball = @game.entityManager.getEntitiesOfType("Ball")[0]
+    return if !ball
 
-    possessorId = balls[0].possessorId
+    # if a new ball has appeared on the scene we'd better clear the possessors
+    if @theBallId != ball.id
+      @possessors = []
+    @theBallId = ball.id
+
+    possessorId = ball.possessorId
 
     if Date.now() - @createdAt > 3000
-      # give people a change to read the intro
+      # give people a chance to read the intro
       avatar = @game.entityManager.entities[possessorId]
       if avatar
         @status.setText("#{avatar.skin} has the ball!")
