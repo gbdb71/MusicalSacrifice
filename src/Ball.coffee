@@ -17,12 +17,13 @@ class Ball extends MS.SingletonEntity
     @sprite.shadow.anchor.set(0.5, 0.5)
 
     @angular = 0
+    @angle = 0
+    @anim = "idle"
     @possessorId = null
     @catchable = false
     @kickTime = Date.now()
     @sprite.animations.add("idle", [6], 20, true)
-    @sprite.animations.add("up", [6, 0, 1, 2, 3, 4, 5], 20, true)
-    @sprite.animations.add("down", [6, 5, 4, 3, 2, 1, 0], 20, true)
+    @sprite.animations.add("roll", [6, 0, 1, 2, 3, 4, 5], 20, true)
     @sprite.animations.play("idle")
 
     @game.physics.arcade.enable(@sprite)
@@ -33,11 +34,13 @@ class Ball extends MS.SingletonEntity
     @sprite.body.drag.set(0, 0)
     @sprite.body.collideWorldBounds = false
     @sprite.body.bounce.set(0, 0)
+    @sprite.rotation = 0 if isNaN(@sprite.rotation)
 
   onGainOwnership:->
     @sprite.body.drag.set(DRAG, DRAG)
     @sprite.body.collideWorldBounds = true
     @sprite.body.bounce.set(0.9, 0.9)
+    @sprite.rotation = 0 if isNaN(@sprite.rotation)
 
   kick:(vector)->
     @rolling = true
@@ -49,8 +52,6 @@ class Ball extends MS.SingletonEntity
     Date.now() - @kickTime
 
   setState:(state)->
-    @angular = state.angular
-    @dampen = state.dampen
     if !@spawned
       @sprite.position.x = state.x
       @sprite.position.y = state.y
@@ -65,23 +66,30 @@ class Ball extends MS.SingletonEntity
     if @possessorId != state.possessorId
       @possessorId = state.possessorId
     @catchable = state.catchable
-    if @sprite.animations.currentAnim? && @sprite.animations.currentAnim.name != state.anim
-      @sprite.animations.play(state.anim)
+    @anim = state.anim
+    @angular = state.angular
+    @angle = state.angle
     if @sprite.body?
-      @sprite.rotation = 0 if _.isNaN?(@sprite.rotation)
+      @sprite.animations.play(@anim)
       @sprite.body.angularVelocity = @angular
-      @sprite.rotation *= 0.8 if @dampen
+      if @angular == 0
+        @sprite.angle = @angle
+      @sprite.rotation = 0 if isNaN(@sprite.rotation)
 
   getState:->
     if @sprite.body?
-      @sprite.rotation = 0 if _.isNaN?(@sprite.rotation)
+      @sprite.animations.play(@anim)
+      @sprite.body.angularVelocity = @angular
+      if @angular == 0
+        @sprite.angle = @angle
+      @sprite.rotation = 0 if isNaN(@sprite.rotation)
     x: @sprite.position.x,
     y: @sprite.position.y,
     possessorId: @possessorId
     catchable: @catchable
-    anim: @sprite.animations.currentAnim?.name
+    anim: @anim
     angular: @angular
-    dampen: @dampen
+    angle: @angle
 
   remove: ->
     @sprite.kill()
@@ -92,6 +100,7 @@ class Ball extends MS.SingletonEntity
     return unless @sprite.body?
 
     velocity = @sprite.body.velocity
+    @sprite.rotation = 0 if isNaN(@sprite.rotation)
 
     if @possessorId?
       possessor = @game.entityManager.entities[@possessorId]
@@ -112,19 +121,32 @@ class Ball extends MS.SingletonEntity
     @sprite.shadow.position.x = @sprite.position.x
     @sprite.shadow.position.y = @sprite.position.y + 6
 
-    @angular = velocity.x * 7
-    @dampen = false
-    anim = "idle"
+    @anim = "idle"
     if velocity.y > 10
-      anim = "up"
-      @dampen = true
+      @anim = "roll"
+      @angular = 0
+      if velocity.x > 100
+        @angle = -45
+      else if velocity.x < -100
+        @angle = 45
+      else
+        @angle = 0
     else if velocity.y < -10
-      anim = "down"
-      @dampen = true
-    @sprite.body.angularVelocity = @angular
-    @sprite.rotation *= 0.8 if @dampen
-    if @sprite.animations.currentAnim.name != anim
-      @sprite.animations.play(anim)
+      @anim = "roll"
+      @angular = 0
+      if velocity.x > 100
+        @angle = -135
+      else if velocity.x < -100
+        @angle = 135
+      else
+        @angle = 180
+    else
+      @angular = velocity.x * 7
+      @angle = 0
+      @angle = @sprite.angle
+      if Math.abs(@angular) < 10
+        @angular = 0
+        @angle *= 0.4
 
     if !@possessorId && @catchable
       # get all avatars and see if any are overlapping
