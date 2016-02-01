@@ -3,7 +3,7 @@ Musical Sacrifice
 
 A magical multiplayer party game, inspired by Wario Ware, with Shakespearian sensibilities. 
 
-![screenshot](https://www.dropbox.com/s/irx9mzcbadb44c5/MusicalSacrifice.png?dl=0)
+![screenshot](https://www.dropbox.com/s/irx9mzcbadb44c5/MusicalSacrifice.png?raw=1)
 
 Features
 --------
