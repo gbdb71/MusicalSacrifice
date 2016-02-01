@@ -3,13 +3,20 @@ Musical Sacrifice
 
 A magical multiplayer party game, inspired by Wario Ware, with Shakespearian sensibilities. 
 
-* Peer-to-peer LAN multiplayer just by visiting a web page
+![screenshot](https://www.dropbox.com/s/irx9mzcbadb44c5/MusicalSacrifice.png?dl=0)
+
+Features
+--------
+
+* Peer-to-peer LAN/Internet multiplayer just by visiting a web page
 * Best played with Chrome or Firefox on the desktop
 * Use cursor keys for movement and ALT to kick Yorick's skull (alas)
 * Type messages to other players
 * Supports game controllers, plays well with an XBOX360 controller
 
-Pro tip: Use a custom URL to ensure only members of your LAN join. For example: https://github.com/rocket-hands/MusicalSacrifice/#MyCompany
+Pro tip: Add a #HashTag to the URL for private games (or to limit games to local players). For example:
+
+https://github.com/rocket-hands/MusicalSacrifice/#CompanyName
 
 More levels and a rock-solid engine will be arriving in the weeks following GGJ16.
 
