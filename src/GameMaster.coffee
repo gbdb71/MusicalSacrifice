@@ -4,7 +4,7 @@ MS = window.MusicalSacrifice
 class GameMaster extends MS.SingletonEntity
   DELAY = 5000
   init:->
-    @possibleLevels = ["Yorick", "Cleaning", "Killing", "Acting"]
+    @possibleLevels = ["Yorick"]
     @currentState = null
     @lastMove = Date.now()
     @level = 'Lobby'
