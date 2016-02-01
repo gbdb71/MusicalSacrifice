@@ -1,8 +1,6 @@
 Musical Sacrifice
 -----------------
 
-A magical multiplayer party game, inspired by Wario Ware, with Shakespearian sensibilities. 
-
 Play now: http://rocket-hands.github.io/MusicalSacrifice/
 
 ![screenshot](https://www.dropbox.com/s/irx9mzcbadb44c5/MusicalSacrifice.png?raw=1)
